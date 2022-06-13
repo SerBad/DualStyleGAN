@@ -10,8 +10,9 @@ import numpy as np
 from pdb import set_trace as st
 from skimage import color
 from IPython import embed
-from model.stylegan.lpips import pretrained_networks as pn
+# from model.stylegan.lpips import pretrained_networks as pn
 
+import model.stylegan.lpips.pretrained_networks as pn
 import model.stylegan.lpips as util
 
 def spatial_average(in_tens, keepdim=True):

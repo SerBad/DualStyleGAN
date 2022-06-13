@@ -11,7 +11,7 @@ class TestOptions():
 
         self.parser = argparse.ArgumentParser(description="Random Artistic Portrait Generation")
         self.parser.add_argument("--batch", type=int, default=8, help="number of generated images")
-        self.parser.add_argument("--style", type=str, default='cartoon', help="target style type")
+        self.parser.add_argument("--style", type=str, default='pixar', help="target style type")
         self.parser.add_argument("--truncation", type=float, default=0.5, help="truncation for intrinsic style code (content)")
         self.parser.add_argument("--weight", type=float, nargs=18, default=[0.75]*7+[1]*11, help="weight of the extrinsic style")
         self.parser.add_argument("--name", type=str, default='cartoon_generate', help="filename to save the generated images")
