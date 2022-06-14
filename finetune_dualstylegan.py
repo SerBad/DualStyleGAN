@@ -529,11 +529,11 @@ if __name__ == "__main__":
     Simgs = []
     print('start instyle_dict!')
     for filename in instyle_dict.keys():
-        print('start instyle_dict! filename', filename)
+        # print('start instyle_dict! filename', filename)
         instyle = instyle_dict[filename]
         exstyle = exstyle_dict[filename]
-        print('start instyle_dict! instyle', instyle)
-        print('start instyle_dict! exstyle', exstyle)
+        # print('start instyle_dict! instyle', instyle)
+        # print('start instyle_dict! exstyle', exstyle)
         # pre-transform z+ into w+ to avoid repeated computation
         with torch.no_grad():
             exstyle = torch.tensor(exstyle).to(device)
@@ -544,9 +544,11 @@ if __name__ == "__main__":
         exstyles += [exstyle]
         Simgs += [Simg]
 
-    print('should next step')
+    print('should next step1')
     instyles = torch.tensor(np.concatenate(instyles, axis=0))  # instrinsic style codes z^+_i
+    print('should next step2')
     Simgs = torch.cat(Simgs, dim=0)  # image S
+    print('should next step3')
     exstyles = torch.tensor(np.concatenate(exstyles, axis=0))  # exstrinsic style codes z^+_e
     print('Data successfully loaded!')
 
