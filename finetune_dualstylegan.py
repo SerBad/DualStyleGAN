@@ -544,6 +544,7 @@ if __name__ == "__main__":
         exstyles += [exstyle]
         Simgs += [Simg]
 
+    print('should next step')
     instyles = torch.tensor(np.concatenate(instyles, axis=0))  # instrinsic style codes z^+_i
     Simgs = torch.cat(Simgs, dim=0)  # image S
     exstyles = torch.tensor(np.concatenate(exstyles, axis=0))  # exstrinsic style codes z^+_e
