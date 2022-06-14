@@ -547,7 +547,11 @@ if __name__ == "__main__":
     print('should next step1')
     instyles = torch.tensor(np.concatenate(instyles, axis=0))  # instrinsic style codes z^+_i
     print('should next step2', len(Simgs))
-    Simgs = torch.cat(Simgs, dim=0)  # image S
+    try:
+        Simgs = torch.cat(Simgs, dim=0)  # image S
+    except Exception as e:
+        print(e)
+
     print('should next step3')
     exstyles = torch.tensor(np.concatenate(exstyles, axis=0))  # exstrinsic style codes z^+_e
     print('Data successfully loaded!')
