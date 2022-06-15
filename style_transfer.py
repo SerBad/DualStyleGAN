@@ -15,7 +15,7 @@ class TestOptions():
     def __init__(self):
 
         self.parser = argparse.ArgumentParser(description="Exemplar-Based Style Transfer")
-        self.parser.add_argument("--content", type=str, default='./data/content/081680.jpg',
+        self.parser.add_argument("--content", type=str, default='./data/content/tx01-20.jpg',
                                  help="path of the content image")
         self.parser.add_argument("--style", type=str, default='head2', help="target style type")
         self.parser.add_argument("--style_id", type=int, default=60, help="the id of the style image")
@@ -28,7 +28,7 @@ class TestOptions():
         self.parser.add_argument("--preserve_color", action="store_true",
                                  help="preserve the color of the content image")
         self.parser.add_argument("--model_path", type=str, default='./checkpoint/', help="path of the saved models")
-        self.parser.add_argument("--model_name", type=str, default='generator.pt',
+        self.parser.add_argument("--model_name", type=str, default='generator-001500.pt',
                                  help="name of the saved dualstylegan")
         self.parser.add_argument("--output_path", type=str, default='./output/', help="path of the output images")
         self.parser.add_argument("--data_path", type=str, default='./data/', help="path of dataset")
@@ -72,6 +72,9 @@ if __name__ == "__main__":
     args = parser.parse()
     print('*' * 98)
 
+    # torchvision.transforms是pytorch中的图像预处理包。一般用Compose把多个步骤整合到一起：
+    # transforms.ToTensor()能够把灰度范围从0-255变换到0-1之间
+    # transforms.Normalize(std=(0.5,0.5,0.5),mean=(0.5,0.5,0.5))，则其作用就是先将输入归一化到(0,1)，再使用公式"(x-mean)/std"，将每个元素分布到(-1,1)
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
@@ -99,6 +102,7 @@ if __name__ == "__main__":
 
     print('Load models successfully!')
 
+    # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
     with torch.no_grad():
         viz = []
         # load content image
