@@ -140,7 +140,7 @@ def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, en
                                   return_latents=True, z_plus_latent=True, return_z_plus_latent=False)
         sample_style = sample_style.detach()
         if get_rank() == 0:
-            print("source_img", source_img, target_img)
+            # print("source_img", source_img, target_img)
             utils.save_image(
                 F.adaptive_avg_pool2d(source_img, 256),
                 f"log/%s-instyle.jpg" % (args.model_name),
