@@ -376,6 +376,9 @@ if __name__ == "__main__":
     if args.local_rank == 0:
         print('*' * 98)
 
+    if not os.path.exists('log'):
+        os.makedirs('log')
+
     n_gpu = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
     args.distributed = n_gpu > 1
 
