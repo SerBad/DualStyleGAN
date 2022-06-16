@@ -11,14 +11,14 @@ from model.dualstylegan import DualStyleGAN
 from model.encoder.psp import pSp
 
 
-class TestOptions():
+class TestOptions:
     def __init__(self):
 
         self.parser = argparse.ArgumentParser(description="Exemplar-Based Style Transfer")
-        self.parser.add_argument("--content", type=str, default='./data/content/tx01-20.jpg',
+        self.parser.add_argument("--content", type=str, default='./data/content/unsplash-rDEOVtE7vOs.jpg',
                                  help="path of the content image")
-        self.parser.add_argument("--style", type=str, default='head2', help="target style type")
-        self.parser.add_argument("--style_id", type=int, default=60, help="the id of the style image")
+        self.parser.add_argument("--style", type=str, default='simpsons', help="target style type")
+        self.parser.add_argument("--style_id", type=int, default=61, help="the id of the style image")
         self.parser.add_argument("--truncation", type=float, default=0.75,
                                  help="truncation for intrinsic style code (content)")
         self.parser.add_argument("--weight", type=float, nargs=18, default=[0.75] * 7 + [1] * 11,
@@ -32,7 +32,7 @@ class TestOptions():
                                  help="name of the saved dualstylegan")
         self.parser.add_argument("--output_path", type=str, default='./output/', help="path of the output images")
         self.parser.add_argument("--data_path", type=str, default='./data/', help="path of dataset")
-        self.parser.add_argument("--align_face", action="store_true", default=True,
+        self.parser.add_argument("--align_face", action="store_true", default=False,
                                  help="apply face alignment to the content image")
         self.parser.add_argument("--exstyle_name", type=str, default=None, help="name of the extrinsic style codes")
 
@@ -66,7 +66,7 @@ def run_alignment(args):
 
 
 if __name__ == "__main__":
-    device = "cuda"
+    device = "cpu"
 
     parser = TestOptions()
     args = parser.parse()
