@@ -42,6 +42,10 @@ def test_tensor():
 
 
 def grad_tensor():
+    # https://blog.csdn.net/u010414589/article/details/115216784
+    # 标量就是一个数字。标量也称为0维数组。
+    # 向量是一组标量组成的列表。向量也称为1维数组。
+
     # x = torch.ones(2, 2, requires_grad=True)
     # x = torch.rand(2, 2, 5, requires_grad=True)
     x = torch.tensor(([[2., 2.], [4., 3.]]), requires_grad=True)
