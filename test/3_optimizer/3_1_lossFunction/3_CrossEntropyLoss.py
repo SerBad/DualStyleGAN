@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 # ----------------------------------- CrossEntropy loss: base
-
+# 交叉熵损失(cross-entropy Loss) 又称为对数似然损失
 loss_f = nn.CrossEntropyLoss(weight=None, size_average=True, reduce=False)
 # 生成网络输出 以及 目标输出
 output = torch.ones(2, 3, requires_grad=True) * 0.5      # 假设一个三分类任务，batchsize=2，假设每个神经元输出都为0.5
