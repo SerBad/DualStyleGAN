@@ -50,7 +50,8 @@ def grad_tensor():
     # x = torch.rand(2, 2, 5, requires_grad=True)
     x = torch.tensor(([[2., 2.], [4., 3.]]), requires_grad=True)
     z = x ** 3 + 2
-    # 转成一维数据
+    # view(1, 4)转成1*4的矩阵，需要和原本的数量保持一致
+    # view中值为-1表示直接转成一维张量
     print(z.view(1, 4))
     # z.sum().backward()
     # 张量不能使用backward()，需要转化为标量，

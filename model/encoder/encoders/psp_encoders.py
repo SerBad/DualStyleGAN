@@ -65,6 +65,8 @@ class GradualStyleEncoder(Module):
             else:
                 style = GradualStyleBlock(512, 512, 64)
             self.styles.append(style)
+        # 例如，``nn.Conv2d`` 接受一个4维的张量，
+        # ``每一维分别是sSamples * nChannels * Height * Width（样本数*通道数*高*宽）``。
         self.latlayer1 = nn.Conv2d(256, 512, kernel_size=1, stride=1, padding=0)
         self.latlayer2 = nn.Conv2d(128, 512, kernel_size=1, stride=1, padding=0)
 
