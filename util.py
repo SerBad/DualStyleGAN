@@ -11,23 +11,27 @@ from model.stylegan.op import conv2d_gradfix
 import random
 import math
 
+
 def visualize(img_arr):
     plt.imshow(((img_arr.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8))
     plt.axis('off')
+
 
 def save_image(img, filename):
     tmp = ((img.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
     cv2.imwrite(filename, cv2.cvtColor(tmp, cv2.COLOR_RGB2BGR))
 
+
 def load_image(filename):
     transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5],std=[0.5,0.5,0.5]),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
     ])
 
     img = Image.open(filename)
     img = transform(img)
     return img.unsqueeze(dim=0)
+
 
 def data_sampler(dataset, shuffle, distributed):
     if distributed:
@@ -68,7 +72,6 @@ def d_logistic_loss(real_pred, fake_pred):
 
 def d_r1_loss(real_pred, real_img):
     with conv2d_gradfix.no_weight_gradients():
-
         grad_real, = autograd.grad(
             outputs=real_pred.sum(), inputs=real_img, create_graph=True
         )
