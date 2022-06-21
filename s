@@ -19,5 +19,6 @@ python -m torch.distributed.launch --nproc_per_node=1 --master_port=8765 pretrai
 
 
 python ./model/stylegan/prepare_data.py --out ./data/caricature/lmdb/ --n_worker 4 --size 1024 ./data/caricature/images/
-
+python finetune_stylegan.py --iter 600 --batch 4 --ckpt ./checkpoint/stylegan2-ffhq-config-f.pt --style caricature --augment ./data/caricature/lmdb/
 python -m torch.distributed.launch --nproc_per_node=8 --master_port=8765 finetune_stylegan.py --iter 600 --batch 4 --ckpt ./checkpoint/stylegan2-ffhq-config-f.pt --style caricature --augment ./data/caricature/lmdb/
+python finetune_stylegan.py --iter 600 --batch 4 --ckpt /kaggle/input/zhoudualstylegan/DualStyleGAN/checkpoint/stylegan2-ffhq-config-f.pt --style head2 --augment /kaggle/input/zhoudualstylegan/DualStyleGAN/data/caricature/lmdb/ --size 1024

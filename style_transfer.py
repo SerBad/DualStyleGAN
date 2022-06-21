@@ -17,13 +17,13 @@ class TestOptions:
         self.parser = argparse.ArgumentParser(description="Exemplar-Based Style Transfer")
         self.parser.add_argument("--content", type=str, default='./data/content/25ac476747deba01b9226e0e467daa20.jpg',
                                  help="path of the content image")
-        self.parser.add_argument("--style", type=str, default='simpsons', help="target style type")
-        self.parser.add_argument("--style_id", type=int, default=61, help="the id of the style image")
+        self.parser.add_argument("--style", type=str, default='caricature', help="target style type")
+        self.parser.add_argument("--style_id", type=int, default=1, help="the id of the style image")
         self.parser.add_argument("--truncation", type=float, default=0.75,
                                  help="truncation for intrinsic style code (content)")
         self.parser.add_argument("--weight", type=float, nargs=18, default=[0.75] * 7 + [1] * 11,
                                  help="weight of the extrinsic style")
-        self.parser.add_argument("--name", type=str, default='simpsons_transfer',
+        self.parser.add_argument("--name", type=str, default='caricature_transfer',
                                  help="filename to save the generated images")
         self.parser.add_argument("--preserve_color", action="store_true",
                                  help="preserve the color of the content image")
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                                    z_plus_latent=True, return_z_plus_latent=True, resize=False)
         img_rec = torch.clamp(img_rec.detach(), -1, 1)
         # viz += [img_rec]
-
+        print('exstyles.keys()', exstyles.keys())
         stylename = list(exstyles.keys())[args.style_id]
         latent = torch.tensor(exstyles[stylename]).to(device)
         if args.preserve_color:

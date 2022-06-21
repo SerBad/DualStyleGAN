@@ -100,6 +100,7 @@ if __name__ == "__main__":
     print(f"Make dataset of image sizes:", ", ".join(str(s) for s in sizes))
 
     imgset = datasets.ImageFolder(args.path)
-
+    # https://blog.csdn.net/dcrmg/article/details/79144507
+    # LMDB的全称是Lightning Memory-Mapped Database(快如闪电的内存映射数据库)，它的文件结构简单，包含一个数据文件和一个锁文件：
     with lmdb.open(args.out, map_size=1024 ** 4, readahead=False) as env:
         prepare(env, imgset, args.n_worker, sizes=sizes, resample=resample)
