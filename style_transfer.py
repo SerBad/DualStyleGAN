@@ -81,6 +81,10 @@ if __name__ == "__main__":
     ])
 
     generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
+    # https://zhuanlan.zhihu.com/p/357075502
+    # model.eval()的作用是不启用 Batch Normalization 和 Dropout。
+    # model.train()的作用是启用 Batch Normalization 和 Dropout。
+    # Batch Normalization原理与实战 https://zhuanlan.zhihu.com/p/34879333
     generator.eval()
 
     ckpt = torch.load(os.path.join(args.model_path, args.style, args.model_name),
