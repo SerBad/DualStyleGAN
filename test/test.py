@@ -1,6 +1,7 @@
 import torch
 
 
+# 拼接的方法
 def cat():
     # # cat
     # x = torch.rand(2, 3)
@@ -59,7 +60,30 @@ def grad_tensor():
     print(z, x, x.grad, sep='\n')
 
 
+def mean_test():
+    # e表示表示10的次方
+    print(1e-8 - 10 ** -8, '2e2', 2e2)
+    # 1除以torch.tensor(4)的开根号
+    print(torch.rsqrt(torch.tensor(4)))
+
+    x = torch.Tensor([1, 2, 3, 4, 5, 6]).view(2, 3)
+    # 对dim维求平均，
+    y_0 = torch.mean(x, dim=0)
+    y_1 = torch.mean(x, dim=1)
+    # 如果要保持维度不变(例如在深度网络中)，则可以加上参数keepdim=True：
+    y_0_0 = torch.mean(x, dim=1, keepdim=True)
+    y_0_1 = torch.mean(x, dim=1, keepdim=False)
+    print(x)
+    print(y_0)
+    print(y_1)
+    print(y_0_0)
+    print(y_0_1)
+    # 操作符 // ，以执行地板除：//除法不管操作数为何种数值类型，总是会舍去小数部分，返回数字序列中比真正的商小的最接近的数字。
+    print("6 // 2 * 2", 6.0 // 5.0)
+
+
 if __name__ == "__main__":
     # cat()
     # test_tensor()
-    grad_tensor()
+    # grad_tensor()
+    mean_test()

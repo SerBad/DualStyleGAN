@@ -19,6 +19,7 @@ def get_keys(d, name):
     return d_filt
 
 
+# https://github.com/eladrich/pixel2style2pixel/tree/master/models
 class pSp(nn.Module):
 
     def __init__(self, opts):

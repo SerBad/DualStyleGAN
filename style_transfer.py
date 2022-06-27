@@ -89,9 +89,14 @@ if __name__ == "__main__":
 
     ckpt = torch.load(os.path.join(args.model_path, args.style, args.model_name),
                       map_location=lambda storage, loc: storage)
+    # "g_ema"是训练结果保存进去的约定值
     generator.load_state_dict(ckpt["g_ema"])
     generator = generator.to(device)
 
+    # 'encoder.pt'是Pixel2style2pixel model
+    # https://zhuanlan.zhihu.com/p/267834502
+    # （1）将图像转成隐藏编码；（2）将人脸转正；（3）图像合成（根据草图或者分割结果生成图像）；（4）将低分辨率图像转成高清图像。
+    # Pixel2style2pixel是基于StyleGAN的latent space进一步的延申
     model_path = os.path.join(args.model_path, 'encoder.pt')
     ckpt = torch.load(model_path, map_location='cpu')
     opts = ckpt['opts']
@@ -102,6 +107,8 @@ if __name__ == "__main__":
     encoder.eval()
     encoder.to(device)
 
+    # 来源于destylize.py保存下来的exstyle_code.npy
+    # 使用encode.py处理之后返回的style code z^+_e的集合
     exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle='TRUE').item()
 
     print('Load models successfully!')
@@ -117,6 +124,7 @@ if __name__ == "__main__":
             I = load_image(args.content).to(device)
         viz += [I]
 
+        # F.adaptive_avg_pool2d自适应平均池化函数
         # reconstructed content image and its intrinsic style code
         img_rec, instyle = encoder(F.adaptive_avg_pool2d(I, 256), randomize_noise=False, return_latents=True,
                                    z_plus_latent=True, return_z_plus_latent=True, resize=False)
