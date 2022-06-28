@@ -21,6 +21,7 @@ from model.encoder.psp import pSp
 from model.vgg import VGG19
 
 try:
+    # 可视化Keras模型
     import wandb
 
 except ImportError:
@@ -93,7 +94,8 @@ class TrainOptions():
         return self.opt
 
 
-def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, encoder, vggloss, device, inject_index=5,
+def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, encoder, vggloss: VGG19, device,
+             inject_index=5,
              savemodel=True):
     loader = sample_data(loader)
     vgg_weights = [0.5, 0.5, 0.5, 0.0, 0.0]
@@ -392,11 +394,8 @@ if __name__ == "__main__":
 
     args.start_iter = 0
 
-    generator = DualStyleGAN(args.size, args.latent, args.n_mlp,
-                             channel_multiplier=args.channel_multiplier).to(device)
-    discriminator = Discriminator(
-        args.size, channel_multiplier=args.channel_multiplier
-    ).to(device)
+    generator = DualStyleGAN(args.size, args.latent, args.n_mlp, channel_multiplier=args.channel_multiplier).to(device)
+    discriminator = Discriminator(args.size, channel_multiplier=args.channel_multiplier).to(device)
     g_ema = DualStyleGAN(args.size, args.latent, args.n_mlp,
                          channel_multiplier=args.channel_multiplier).to(device)
     g_ema.eval()

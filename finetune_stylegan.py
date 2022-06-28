@@ -56,7 +56,7 @@ class TrainOptions():
         self.parser.add_argument("--lr", type=float, default=0.002, help="learning rate")
         self.parser.add_argument("--channel_multiplier", type=int, default=2,
                                  help="channel multiplier factor for the model. config-f = 2, else = 1")
-        self.parser.add_argument("--wandb", action="store_true", help="use weights and biases logging")
+        self.parser.add_argument("--wandb", action="store_true", default=True, help="use weights and biases logging")
         self.parser.add_argument("--local_rank", type=int, default=0, help="local rank for distributed training")
         self.parser.add_argument("--augment", action="store_true", help="apply non leaking augmentation")
         self.parser.add_argument("--augment_p", type=float, default=0,
