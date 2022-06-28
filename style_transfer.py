@@ -94,6 +94,7 @@ if __name__ == "__main__":
     generator = generator.to(device)
 
     # 'encoder.pt'是Pixel2style2pixel model
+    # https://github.com/eladrich/pixel2style2pixel
     # https://zhuanlan.zhihu.com/p/267834502
     # （1）将图像转成隐藏编码；（2）将人脸转正；（3）图像合成（根据草图或者分割结果生成图像）；（4）将低分辨率图像转成高清图像。
     # Pixel2style2pixel是基于StyleGAN的latent space进一步的延申

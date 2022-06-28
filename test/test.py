@@ -1,4 +1,5 @@
 import torch
+import math
 
 
 # 拼接的方法
@@ -80,6 +81,8 @@ def mean_test():
     print(y_0_1)
     # 操作符 // ，以执行地板除：//除法不管操作数为何种数值类型，总是会舍去小数部分，返回数字序列中比真正的商小的最接近的数字。
     print("6 // 2 * 2", 6.0 // 5.0)
+    print("math.log(size, 2)", math.log(1024, 2), " 2 ** 10 ", 2 ** 10)
+    print("torch.eye(512)", torch.eye(512) * 512.0 ** 0.5)
 
 
 if __name__ == "__main__":
