@@ -314,6 +314,7 @@ class NoiseInjection(nn.Module):
 
     def forward(self, image, noise=None):
         if noise is None:
+            # print("NoiseInjection image", image.shape)
             batch, _, height, width = image.shape
             noise = image.new_empty(batch, 1, height, width).normal_()
 

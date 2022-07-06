@@ -84,6 +84,9 @@ def mean_test():
     print("math.log(size, 2)", math.log(1024, 2), " 2 ** 10 ", 2 ** 10)
     print("torch.eye(512)", torch.eye(512) * 512.0 ** 0.5)
 
+    print("torch.tensor(True)", torch.tensor(True).item())
+
+
 
 if __name__ == "__main__":
     # cat()

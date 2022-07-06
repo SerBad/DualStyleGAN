@@ -1,6 +1,10 @@
 import random
+
 import torch
 from torch import nn
+import torchvision.transforms as T
+
+import numpy as np
 from model.stylegan.model import ConvLayer, PixelNorm, EqualLinear, Generator
 
 
@@ -103,6 +107,21 @@ class DualStyleGAN(nn.Module):
             fuse_index=18,  # layers > fuse_index do not use the extrinsic style path
             interp_weights=[1] * 18,  # weight vector for style combination of two paths
     ):
+        print("这里会执行到吗？", "input_is_latent", input_is_latent, z_plus_latent)
+        # styles = styles
+        # exstyles = exstyles
+        # return_latents = return_latents.item()
+        # return_feat = return_feat.item()
+        # inject_index = inject_index
+        # truncation = truncation.item()
+        # truncation_latent = truncation_latent.item()
+        # input_is_latent = input_is_latent.item()
+        # noise = noise
+        # randomize_noise = randomize_noise.item()
+        # z_plus_latent = z_plus_latent.item()
+        # use_res = use_res.item()
+        # fuse_index = fuse_index.item()
+        # interp_weights = interp_weights
 
         if not input_is_latent:
             if not z_plus_latent:
@@ -110,7 +129,7 @@ class DualStyleGAN(nn.Module):
             else:
                 styles = [self.generator.style(s.reshape(s.shape[0] * s.shape[1], s.shape[2])).reshape(s.shape) for s in
                           styles]
-
+        print("这里会执行到吗？", "noise", noise, 'randomize_noise', randomize_noise)
         if noise is None:
             if randomize_noise:
                 noise = [None] * self.generator.num_layers
@@ -190,14 +209,23 @@ class DualStyleGAN(nn.Module):
                 skip = to_rgb(out, latent[:, i + 2], skip)
             i += 2
             if i > self.res_index and return_feat:
+                print("这里执行到了没？回事因为最后输出的问题吗11？")
                 return out, skip
 
         image = skip
-
+        # print("这里执行到了没？回事因为最后输出的问题吗22？", image)
         if return_latents:
             return image, latent
-
         else:
+            # image = torch.clamp(image.detach(), -1, 1)[0].cpu()
+            # print(image.shape)
+            # # image = image.to(memory_format=torch.preserve_format)
+            # # image = T.ToTensor()(image)
+            # print(image.layout)
+            # # print(exstyles)
+            # # image.show()
+            # image = T.ToPILImage()(image)
+            # return T.ToTensor()(image)
             return image, None
 
     def make_noise(self):
