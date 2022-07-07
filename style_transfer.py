@@ -17,7 +17,7 @@ class TestOptions:
         self.parser = argparse.ArgumentParser(description="Exemplar-Based Style Transfer")
         self.parser.add_argument("--content", type=str, default='./data/content/unsplash-rDEOVtE7vOs.jpg',
                                  help="path of the content image")
-        self.parser.add_argument("--style", type=str, default='simpsons', help="target style type")
+        self.parser.add_argument("--style", type=str, default='head2-copy', help="target style type")
         self.parser.add_argument("-style_id", type=int, default=3, help="the id of the style image")
         self.parser.add_argument("--truncation", type=float, default=0.75,
                                  help="truncation for intrinsic style code (content)")
