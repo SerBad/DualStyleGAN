@@ -11,7 +11,7 @@ from torchvision import transforms
 
 import torchvision
 import onnx
-import onnxruntime
+# import onnxruntime
 import netron
 
 
@@ -50,13 +50,16 @@ class Net(nn.Module):
         return num_features
 
 
+torch.set_printoptions(profile='full')
 net = Net()
+input = torch.randn(1, 1, 32, 32)
+
 print(net)
-print("torch.ones(1,2,4)",torch.ones(1,2,4))
-print(net(torch.ones(1,5,5)))
+print("input", input.size())
+print("net(input)", net(input))
 path = "./main.onnx"
 torch.onnx.export(net,
-                  torch.rand(1,5,5),
+                  input,
                   path,
                   verbose=True,
                   export_params=True,
@@ -67,10 +70,12 @@ torch.onnx.export(net,
                   keep_initializers_as_inputs=True)
 
 print(onnx.checker.check_model(onnx.load(path)))
+netron.start(path)
+# onnx.save(onnx.shape_inference.infer_shapes(path), onnx.load(path))
 
-session = onnxruntime.InferenceSession(path)
-print("session.get_inputs()", session.get_inputs())
-for o in session.get_inputs():
-    print(o)
-for o in session.get_outputs():
-    print("session.get_outputs()", o)
+# session = onnxruntime.InferenceSession(path)
+# print("session.get_inputs()", session.get_inputs())
+# for o in session.get_inputs():
+#     print(o)
+# for o in session.get_outputs():
+#     print("session.get_outputs()", o)

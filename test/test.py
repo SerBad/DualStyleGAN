@@ -42,6 +42,9 @@ def test_tensor():
     # y.grad是1
     print(z, x, x.grad_fn, x.grad, y.grad)
 
+    print(torch.ones(2, 3))
+    print(torch.rand(2, 3, 4, 5))
+
 
 def grad_tensor():
     # https://blog.csdn.net/u010414589/article/details/115216784
@@ -87,9 +90,8 @@ def mean_test():
     print("torch.tensor(True)", torch.tensor(True).item())
 
 
-
 if __name__ == "__main__":
     # cat()
-    # test_tensor()
+    test_tensor()
     # grad_tensor()
-    mean_test()
+    # mean_test()
