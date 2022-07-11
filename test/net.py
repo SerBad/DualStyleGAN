@@ -23,6 +23,13 @@ class Net(nn.Module):
         # kernel
         # 全连接层，三个参数分别是，输入通道，输出通道，卷积核大小
         self.conv1 = nn.Conv2d(1, 6, 5)
+        # 例如，``nn.Conv2d``
+        # 接受一个4维的张量，
+        # ``每一维分别是sSamples * nChannels * Height * Width（样本数 * 通道数 * 高 * 宽）``。
+        #
+        # 如果你有单个样本，只需使用
+        # ``input.unsqueeze(0)``
+        # 来添加其它的维数 < / p > < / div >
         self.conv2 = nn.Conv2d(6, 16, 5)
         # an affine operation: y = Wx + b
         # 全连接层
