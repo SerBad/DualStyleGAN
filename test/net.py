@@ -11,7 +11,7 @@ from torchvision import transforms
 
 import torchvision
 import onnx
-# import onnxruntime
+import onnxruntime
 import netron
 
 
@@ -57,32 +57,96 @@ class Net(nn.Module):
         return num_features
 
 
-torch.set_printoptions(profile='full')
-net = Net()
-input = torch.randn(1, 1, 32, 32)
+class Net2(nn.Module):
 
-print(net)
-print("input", input.size())
-print("net(input)", net(input))
-path = "./main.onnx"
-torch.onnx.export(net,
-                  input,
-                  path,
-                  verbose=True,
-                  export_params=True,
-                  opset_version=11,
-                  do_constant_folding=True,
-                  input_names=["input"],
-                  output_names=["output"],
-                  keep_initializers_as_inputs=True)
+    def __init__(self):
+        super(Net2, self).__init__()
+        # 1 input image channel, 6 output channels, 5x5 square convolution
+        # kernel
+        # 全连接层，三个参数分别是，输入通道，输出通道，卷积核大小
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        # 例如，``nn.Conv2d``
+        # 接受一个4维的张量，
+        # ``每一维分别是sSamples * nChannels * Height * Width（样本数 * 通道数 * 高 * 宽）``。
+        #
+        # 如果你有单个样本，只需使用
+        # ``input.unsqueeze(0)``
+        # 来添加其它的维数 < / p > < / div >
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        # an affine operation: y = Wx + b
+        # 全连接层
+        # https://blog.csdn.net/qq_42079689/article/details/102873766
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
 
-print(onnx.checker.check_model(onnx.load(path)))
-netron.start(path)
-# onnx.save(onnx.shape_inference.infer_shapes(path), onnx.load(path))
+    def forward(self, x):
+        x = F.relu(x)
+        return x
 
-# session = onnxruntime.InferenceSession(path)
-# print("session.get_inputs()", session.get_inputs())
-# for o in session.get_inputs():
-#     print(o)
-# for o in session.get_outputs():
-#     print("session.get_outputs()", o)
+
+def test_net():
+    net = Net()
+    input = torch.randn(1, 1, 32, 32)
+
+    print(net)
+    print("input", input.size())
+    print("net(input)", net(input))
+    path = "./main.onnx"
+    torch.onnx.export(net,
+                      input,
+                      path,
+                      verbose=True,
+                      export_params=True,
+                      opset_version=11,
+                      do_constant_folding=True,
+                      input_names=["input"],
+                      output_names=["output"],
+                      keep_initializers_as_inputs=True)
+
+    print(onnx.checker.check_model(onnx.load(path)))
+    # netron.start(path)
+    # onnx.save(onnx.shape_inference.infer_shapes(path), onnx.load(path))
+
+    session = onnxruntime.InferenceSession(path)
+    print("session.get_inputs()", session.get_inputs())
+    for o in session.get_inputs():
+        print(o)
+    for o in session.get_outputs():
+        print("session.get_outputs()", o)
+
+
+def test_net2():
+    net = Net2()
+    input = torch.randn(1, )
+
+    print(net)
+    print("input", input.size())
+    print("net(input)", net(input))
+    path = "./Net2.onnx"
+    torch.onnx.export(net,
+                      input,
+                      path,
+                      verbose=True,
+                      export_params=True,
+                      opset_version=11,
+                      do_constant_folding=True,
+                      input_names=["input"],
+                      output_names=["output"],
+                      keep_initializers_as_inputs=True)
+
+    print(onnx.checker.check_model(onnx.load(path)))
+    # netron.start(path)
+    # onnx.save(onnx.shape_inference.infer_shapes(path), onnx.load(path))
+
+    session = onnxruntime.InferenceSession(path)
+    print("session.get_inputs()", session.get_inputs())
+    for o in session.get_inputs():
+        print(o)
+    for o in session.get_outputs():
+        print("session.get_outputs()", o)
+
+
+if __name__ == "__main__":
+    torch.set_printoptions(profile='full')
+    test_net2()
