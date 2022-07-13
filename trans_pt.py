@@ -30,9 +30,9 @@ def save_jit():
     generator.load_state_dict(ckpt["g_ema"])
     generator.eval()
     generator = generator.to(device)
-    exstyles = np.load(root+"checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle=True).item()
+    exstyles = np.load(root + "checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle=True).item()
 
-    model_path = os.path.join(root+'checkpoint', 'encoder.pt')
+    model_path = os.path.join(root + 'checkpoint', 'encoder.pt')
     ckpt = torch.load(model_path, map_location='cuda')
     opts = ckpt['opts']
     opts['checkpoint_path'] = model_path
@@ -45,7 +45,9 @@ def save_jit():
     with torch.no_grad():
         img = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
         # img = F.adaptive_avg_pool2d(img, 256)
-        instyle = encoder(img)
+        # instyle = encoder(img)
+        instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
+                          z_plus_latent=True, return_z_plus_latent=True, resize=False)
         "head2-copy-mobile_model_encoder.ptl"
 
         # traced_script_module_encoder = torch.jit.trace(encoder, img, check_trace=False)
