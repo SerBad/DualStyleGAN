@@ -54,11 +54,13 @@ class AdaResBlock(nn.Module):
 class DualStyleGAN(nn.Module):
     def __init__(self, size, style_dim, n_mlp, channel_multiplier=2, twoRes=True, res_index=6):
         super().__init__()
-
+        print("初始化？", "style_dim", style_dim, "n_mlp", n_mlp)
         layers = [PixelNorm()]
         for i in range(n_mlp - 6):
+            print("执行了几遍？")
             # EqualLinear 基于linear和conv，通过缩放网络权重，使得每一层的参数的学习率能够保持一致，从而能增强GAN的稳定性，改善图像质量。
             layers.append(EqualLinear(512, 512, lr_mul=0.01, activation="fused_lrelu"))
+        print("layers的层数", len(layers))
         # color transform blocks T_c
         # nn.Sequential 一个有序的容器，神经网络模块将按照在传入构造器的顺序依次被添加到计算图中执行
         self.style = nn.Sequential(*layers)
@@ -123,6 +125,20 @@ class DualStyleGAN(nn.Module):
         # fuse_index = fuse_index.item()
         # interp_weights = interp_weights
 
+        return_latents = False,
+        return_feat = False,
+        inject_index = None,
+        truncation = 0.75,
+        truncation_latent = 0,
+        input_is_latent = False,
+        noise = None,
+        randomize_noise = True,
+        z_plus_latent = True,  # intrinsic style code is z+ or z
+        use_res = True,  # whether to use the extrinsic style path
+        fuse_index = 18,  # layers > fuse_index do not use the extrinsic style path
+        interp_weights = [0.75] * 7 + [1] * 11,  # weight vector for style combination of two paths
+
+
         if not input_is_latent:
             if not z_plus_latent:
                 styles = [self.generator.style(s) for s in styles]
@@ -147,7 +163,7 @@ class DualStyleGAN(nn.Module):
                 )
 
             styles = style_t
-
+        print("这里执行到了没？回事因为最后输出的问题吗33？")
         if len(styles) < 2:
             inject_index = self.generator.n_latent
 
@@ -168,7 +184,7 @@ class DualStyleGAN(nn.Module):
                 latent = torch.cat([latent, latent2], 1)
             else:
                 latent = torch.cat([styles[0][:, 0:inject_index], styles[1][:, inject_index:]], 1)
-
+        print("这里执行到了没？回事因为最后输出的问题吗44？")
         if use_res:
             if exstyles.ndim < 3:
                 resstyles = self.style(exstyles).unsqueeze(1).repeat(1, self.generator.n_latent, 1)
@@ -182,7 +198,7 @@ class DualStyleGAN(nn.Module):
         out = self.generator.conv1(out, latent[:, 0], noise=noise[0])
         if use_res and fuse_index > 0:
             out = self.res[0](out, resstyles[:, 0], interp_weights[0])
-
+        print("这里执行到了没？回事因为最后输出的问题吗5t5？")
         skip = self.generator.to_rgb1(out, latent[:, 1])
         i = 1
         for conv1, conv2, noise1, noise2, to_rgb in zip(
@@ -208,25 +224,37 @@ class DualStyleGAN(nn.Module):
             else:
                 skip = to_rgb(out, latent[:, i + 2], skip)
             i += 2
+            print("这里执行到了没？回事因为最后输出的问题吗66？", i)
             if i > self.res_index and return_feat:
                 print("这里执行到了没？回事因为最后输出的问题吗11？")
                 return out, skip
 
         image = skip
-        # print("这里执行到了没？回事因为最后输出的问题吗22？", image)
-        if return_latents:
-            return image, latent
-        else:
-            # image = torch.clamp(image.detach(), -1, 1)[0].cpu()
-            # print(image.shape)
-            # # image = image.to(memory_format=torch.preserve_format)
-            # # image = T.ToTensor()(image)
-            # print(image.layout)
-            # # print(exstyles)
-            # # image.show()
-            # image = T.ToPILImage()(image)
-            # return T.ToTensor()(image)
-            return image, None
+        print("这里执行到了没？回事因为最后输出的问题吗22？", image)
+        image = torch.clamp(image.detach(), -1, 1)[0].cpu()
+        print(image.shape)
+        # image = image.to(memory_format=torch.preserve_format)
+        # image = T.ToTensor()(image)
+        print(image.layout)
+        # print(exstyles)
+        # image.show()
+        image = T.ToPILImage()(image)
+        return T.ToTensor()(image)
+        # return image
+
+        # if return_latents:
+        #     return image, latent
+        # else:
+        #     # image = torch.clamp(image.detach(), -1, 1)[0].cpu()
+        #     # print(image.shape)
+        #     # # image = image.to(memory_format=torch.preserve_format)
+        #     # # image = T.ToTensor()(image)
+        #     # print(image.layout)
+        #     # # print(exstyles)
+        #     # # image.show()
+        #     # image = T.ToPILImage()(image)
+        #     # return T.ToTensor()(image)
+        #     return image, None
 
     def make_noise(self):
         return self.generator.make_noise()

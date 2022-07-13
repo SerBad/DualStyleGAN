@@ -9,7 +9,8 @@ from torch.nn import functional as F
 import torchvision
 from model.dualstylegan import DualStyleGAN
 from model.encoder.psp import pSp
-
+import onnx
+import onnxruntime
 
 class TestOptions:
     def __init__(self):
@@ -30,7 +31,7 @@ class TestOptions:
         self.parser.add_argument("--model_path", type=str, default='./checkpoint/', help="path of the saved models")
         self.parser.add_argument("--model_name", type=str, default='generator-001500.pt',
                                  help="name of the saved dualstylegan")
-        self.parser.add_argument("--output_path", type=str, default='./output/', help="path of the output images")
+        self.parser.add_argument("--output_path", type=str, default='./output-test/', help="path of the output images")
         self.parser.add_argument("--data_path", type=str, default='./data/', help="path of dataset")
         self.parser.add_argument("--align_face", action="store_true", default=False,
                                  help="apply face alignment to the content image")
@@ -104,13 +105,13 @@ if __name__ == "__main__":
     opts['checkpoint_path'] = model_path
     opts = Namespace(**opts)
     opts.device = device
-    encoder = pSp(opts)
-    encoder.eval()
-    encoder.to(device)
+    # encoder = pSp(opts)
+    # encoder.eval()
+    # encoder.to(device)
 
     # 来源于destylize.py保存下来的exstyle_code.npy
     # 使用encode，也就是pSp处理之后返回的style code z^+_e的集合
-    exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle='TRUE').item()
+    exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
 
     print('Load models successfully!')
 
@@ -124,12 +125,39 @@ if __name__ == "__main__":
         else:
             I = load_image(args.content).to(device)
         viz += [I]
-
+        # img_rec, instyle = encoder(F.adaptive_avg_pool2d(I, 256), randomize_noise=False, return_latents=True,
+        #                            z_plus_latent=True, return_z_plus_latent=True, resize=False)
         # F.adaptive_avg_pool2d自适应平均池化函数
         # reconstructed content image and its intrinsic style code
-        img_rec, instyle = encoder(F.adaptive_avg_pool2d(I, 256), randomize_noise=False, return_latents=True,
-                                   z_plus_latent=True, return_z_plus_latent=True, resize=False)
-        img_rec = torch.clamp(img_rec.detach(), -1, 1)
+        model = torch.jit.load("head2-copy_model_encoder.jit")
+        instyle = model(F.adaptive_avg_pool2d(I, 256))
+        input_names = ["input"]
+        output_names = ["output"]
+        path = "./head2-copy2_encoder.onnx"
+        torch.onnx.export(model,
+                          F.adaptive_avg_pool2d(I, 256),
+                          path,
+                          verbose=True,
+                          export_params=True,
+                          opset_version=11,
+                          do_constant_folding=True,
+                          input_names=input_names,
+                          output_names=output_names,
+                          keep_initializers_as_inputs=True)
+
+        print(onnx.checker.check_model(onnx.load(path)))
+
+        session = onnxruntime.InferenceSession(path)
+        print("session.get_inputs()", session.get_inputs())
+        for o in session.get_inputs():
+            print(o)
+        for o in session.get_outputs():
+            print("session.get_outputs()", o)
+
+
+        # instyle = encoder(F.adaptive_avg_pool2d(I, 256) )
+
+        # img_rec = torch.clamp(img_rec.detach(), -1, 1)
         # viz += [img_rec]
         print('exstyles.keys()', exstyles.keys())
         stylename = list(exstyles.keys())[args.style_id]
