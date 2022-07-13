@@ -64,7 +64,7 @@ def save_jit():
 
         # extrinsic styte code
         print("traced_script_module", "为什么这里什么也没有？", instyle)
-        traced_script_module = torch.jit.trace(generator, (instyle, exstyles), check_inputs=(instyle, exstyles))
+        traced_script_module = torch.jit.trace(generator, (instyle, exstyles) )
         print("traced_script_module", traced_script_module)
         traced_script_module.save("head2-copy_model.jit")
 
