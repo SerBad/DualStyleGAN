@@ -72,6 +72,10 @@ def save_jit():
         # traced_script_module_optimized = optimize_for_mobile(traced_script_module, backend='Vulkan')
         # traced_script_module_optimized._save_for_lite_interpreter("head2-copy-mobile_model.ptl")
 
+        # 报错如下
+        # Could not export Python function call 'FusedLeakyReLUFunction'. Remove calls to Python functions before export.
+        # Did you forget to add @script or @script_method annotation? If this is a nn.ModuleList, add it to __constants__:
+
 
 def load_jit():
     model = torch.jit.load("head2-copy_model.pt")
