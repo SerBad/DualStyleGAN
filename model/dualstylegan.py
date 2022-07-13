@@ -127,6 +127,8 @@ class DualStyleGAN(nn.Module):
         # interp_weights = interp_weights
 
         styles = [styles]
+        exstyles = self.generator.style(exstyles.reshape(exstyles.shape[0] * exstyles.shape[1], exstyles.shape[2])).reshape(
+            exstyles.shape)
         return_latents = False
         return_feat = False
         inject_index = None
