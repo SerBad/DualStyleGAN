@@ -58,6 +58,7 @@ class DualStyleGAN(nn.Module):
         layers = [PixelNorm()]
         for i in range(n_mlp - 6):
             print("执行了几遍？")
+            # 和StyleGAN一样的全连接层，但这里只用了2个，不知道为什么
             # EqualLinear 基于linear和conv，通过缩放网络权重，使得每一层的参数的学习率能够保持一致，从而能增强GAN的稳定性，改善图像质量。
             layers.append(EqualLinear(512, 512, lr_mul=0.01, activation="fused_lrelu"))
         print("layers的层数", len(layers))

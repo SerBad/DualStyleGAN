@@ -410,8 +410,10 @@ class Generator(nn.Module):
         self.style_dim = style_dim
 
         layers = [PixelNorm()]
+        # 8个全链接层，为了让特征分层，避免特征纠缠
 
         for i in range(n_mlp):
+            # EqualLinear的输入和输出的大小是一样的，
             layers.append(
                 EqualLinear(
                     style_dim, style_dim, lr_mul=lr_mlp, activation="fused_lrelu"
