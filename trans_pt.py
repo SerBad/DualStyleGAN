@@ -59,12 +59,12 @@ def save_jit():
         stylename = list(exstyles.keys())[5]
         # print("stylename", stylename)
         # print("exstyles[stylename]", exstyles[stylename])
-        exstyles = torch.tensor(exstyles[stylename]).to(device)
+        latent = torch.tensor(exstyles[stylename]).to(device)
         # print("latent", latent)
 
         # extrinsic styte code
         print("traced_script_module", "为什么这里什么也没有？", instyle)
-        traced_script_module = torch.jit.trace(generator, (instyle, exstyles) )
+        traced_script_module = torch.jit.trace(generator, (instyle, latent), check_inputs=(instyle, latent))
         print("traced_script_module", traced_script_module)
         traced_script_module.save("head2-copy_model.jit")
 
