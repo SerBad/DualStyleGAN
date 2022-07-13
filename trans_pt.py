@@ -67,7 +67,7 @@ def save_jit():
         traced_script_module = torch.jit.trace(generator, (instyle, latent), check_inputs=(instyle, latent),
                                                check_trace=False)
         print("traced_script_module", traced_script_module)
-        traced_script_module.save("head2-copy_model.pt")
+        traced_script_module.save("head2-copy_model.jit")
 
         # traced_script_module_optimized = optimize_for_mobile(traced_script_module, backend='Vulkan')
         # traced_script_module_optimized._save_for_lite_interpreter("head2-copy-mobile_model.ptl")
