@@ -139,7 +139,6 @@ class DualStyleGAN(nn.Module):
         fuse_index = 18,  # layers > fuse_index do not use the extrinsic style path
         interp_weights = [0.75] * 7 + [1] * 11,  # weight vector for style combination of two paths
 
-
         if not input_is_latent:
             if not z_plus_latent:
                 styles = [self.generator.style(s) for s in styles]
@@ -154,7 +153,7 @@ class DualStyleGAN(nn.Module):
                 noise = [
                     getattr(self.generator.noises, f"noise_{i}") for i in range(self.generator.num_layers)
                 ]
-
+        print("truncation", truncation)
         if truncation < 1:
             style_t = []
 
