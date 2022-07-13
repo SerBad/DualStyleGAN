@@ -126,6 +126,7 @@ class DualStyleGAN(nn.Module):
         # fuse_index = fuse_index.item()
         # interp_weights = interp_weights
 
+        styles = [styles]
         return_latents = False
         return_feat = False
         inject_index = None
