@@ -90,8 +90,22 @@ def mean_test():
     print("torch.tensor(True)", torch.tensor(True).item())
 
 
+def for_tes():
+    data = [3, 7, 9, 5, 6, 7, 6, 1]
+
+    def add(s: int) -> int:
+        return s + s
+
+    # for循环的一种简单方式
+    result = [add(s) for s in data]
+
+    for s in result:
+        print("s", s)
+
+
 if __name__ == "__main__":
     # cat()
-    test_tensor()
+    # test_tensor()
     # grad_tensor()
     # mean_test()
+    for_tes()
