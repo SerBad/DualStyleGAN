@@ -38,7 +38,9 @@ if __name__ == "__main__":
     # torch.onnx.symbolic_registry.UnsupportedOperatorError: Exporting the operator prim::layout to ONNX opset version 11 is not supported. Please feel free to request support or submit a pull request on PyTorch GitHub.
     with torch.no_grad():
         I = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
-        instyle = encoder(I)
+        # instyle = encoder(I)
+        _, instyle = encoder(F.adaptive_avg_pool2d(I, 256), randomize_noise=False, return_latents=True,
+                             z_plus_latent=True, return_z_plus_latent=True, resize=False)
 
         stylename = list(exstyles.keys())[5]
         # print("stylename", stylename)
