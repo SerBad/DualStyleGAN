@@ -84,5 +84,5 @@ def load_jit():
 
 
 if __name__ == "__main__":
-    # save_jit()
+    save_jit()
     load_jit()
