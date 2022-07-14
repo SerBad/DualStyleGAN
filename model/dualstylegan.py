@@ -235,14 +235,14 @@ class DualStyleGAN(nn.Module):
 
         image = skip
         print("这里执行到了没？回事因为最后输出的问题吗22？", image)
-        image = torch.clamp(image.detach(), -1, 1)[0].cpu()
-        print(image.shape)
-        # image = image.to(memory_format=torch.preserve_format)
-        # image = T.ToTensor()(image)
-        print(image.layout)
-        # print(exstyles)
-        # image.show()
-        image = T.ToPILImage()(image)
+        # image = torch.clamp(image.detach(), -1, 1)[0].cpu()
+        # # print(image.shape)
+        # # image = image.to(memory_format=torch.preserve_format)
+        # # image = T.ToTensor()(image)
+        # print(image.layout)
+        # # print(exstyles)
+        # # image.show()
+        # image = T.ToPILImage()(image)
         return T.ToTensor()(image)
         # return image
 

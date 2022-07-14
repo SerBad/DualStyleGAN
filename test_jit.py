@@ -59,7 +59,7 @@ if __name__ == "__main__":
     args = parser.parse()
     print('*' * 98)
 
-    generator = torch.jit.load("head2-copy-mobile_model.ptl")
+    generator = torch.jit.load("head2-copy_model.jit")
     exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
 
     print('Load models successfully!')
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         I = load_image(args.content).to(device)
         viz += [I]
 
-        instyle = torch.jit.load("head2-copy-mobile_model_encoder.ptl")(I)
+        instyle = torch.jit.load("head2-copy_model_encoder.jit")(F.adaptive_avg_pool2d(I, 256))
 
 
         print('exstyles.keys()', exstyles.keys())
@@ -83,8 +83,8 @@ if __name__ == "__main__":
     print('Generate images successfully!')
 
     save_name = args.name + '_%d_%s' % (args.style_id, os.path.basename(args.content).split('.')[0])
-    # save_image(torchvision.utils.make_grid(F.adaptive_avg_pool2d(torch.cat(viz, dim=0), 256), 4, 2).cpu(),
-    #            os.path.join(args.output_path, save_name + '_overview.jpg'))
+    save_image(torchvision.utils.make_grid(F.adaptive_avg_pool2d(torch.cat(viz, dim=0), 256), 4, 2).cpu(),
+               os.path.join(args.output_path, save_name + '_overview.jpg'))
     save_image(img_gen.cpu(), os.path.join(args.output_path, save_name + '.jpg'))
 
     print('Save images successfully!')
