@@ -101,6 +101,7 @@ class FusedLeakyReLU(nn.Module):
 
 
 def fused_leaky_relu(input, bias=None, negative_slope=0.2, scale=2 ** 0.5):
+    # 为了支持能够导出网络，这里全部替换成不用c++拓展的方法
     # if input.device.type == "cpu":
     if bias is not None:
         rest_dim = [1] * (input.ndim - bias.ndim - 1)
