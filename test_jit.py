@@ -59,7 +59,7 @@ if __name__ == "__main__":
     args = parser.parse()
     print('*' * 98)
 
-    generator = torch.jit.load("head2-copy_model.jit")
+    generator = torch.jit.load("head2-copy_model (1).jit")
     exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
 
     print('Load models successfully!')
@@ -78,6 +78,7 @@ if __name__ == "__main__":
         latent = torch.tensor(exstyles[stylename]).to(device)
 
         img_gen = generator(instyle, latent)
+        img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)
         viz += [img_gen]
 
     print('Generate images successfully!')
