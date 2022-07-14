@@ -14,8 +14,8 @@ import onnxruntime
 import netron
 
 if __name__ == "__main__":
-    device = "cpu"
-    generator = DualStyleGAN()
+    device = "cuda"
+    generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
     ckpt = torch.load("checkpoint/head2-copy/generator-001500.pt", map_location=lambda storage, loc: storage)
     # netron.start("checkpoint/head2-copy/generator-001500.pt")
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     exstyles = np.load("checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle='TRUE').item()
 
     model_path = os.path.join('checkpoint', 'encoder.pt')
-    ckpt = torch.load(model_path, map_location='cpu')
+    ckpt = torch.load(model_path, map_location=device)
     opts = ckpt['opts']
     opts['checkpoint_path'] = model_path
     opts = Namespace(**opts)
@@ -80,11 +80,7 @@ if __name__ == "__main__":
                           do_constant_folding=True,
                           input_names=input_names,
                           output_names=output_names,
-                          keep_initializers_as_inputs=True,
-                          dynamic_axes={
-                              "input": {0: "ss", 1: "yy"},
-                              "output": [0]
-                          })
+                          keep_initializers_as_inputs=True )
 
         print(onnx.checker.check_model(onnx.load(path)))
 

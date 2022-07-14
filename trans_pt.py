@@ -78,11 +78,11 @@ def save_jit():
 
 
 def load_jit():
-    model = torch.jit.load("head2-copy_model.pt")
+    model = torch.jit.load("head2-copy_model.jit")
     print(model)
     model.eval()
 
 
 if __name__ == "__main__":
-    save_jit()
+    # save_jit()
     load_jit()
