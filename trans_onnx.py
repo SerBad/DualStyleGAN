@@ -15,17 +15,18 @@ import netron
 
 if __name__ == "__main__":
     device = "cuda"
+    root = "/kaggle/input/zhoudualstylegan/DualStyleGAN/"
     generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
-    ckpt = torch.load("checkpoint/head2-copy/generator-001500.pt", map_location=lambda storage, loc: storage)
+    ckpt = torch.load(root+"checkpoint/head2-copy/generator-001500.pt", map_location=lambda storage, loc: storage)
     # netron.start("checkpoint/head2-copy/generator-001500.pt")
 
     # "g_ema"是训练结果保存进去的约定值
     generator.load_state_dict(ckpt["g_ema"])
     generator.eval()
     generator = generator.to(device)
-    exstyles = np.load("checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle='TRUE').item()
+    exstyles = np.load(root+"checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle='TRUE').item()
 
-    model_path = os.path.join('checkpoint', 'encoder.pt')
+    model_path = os.path.join(root+'checkpoint', 'encoder.pt')
     ckpt = torch.load(model_path, map_location=device)
     opts = ckpt['opts']
     opts['checkpoint_path'] = model_path
