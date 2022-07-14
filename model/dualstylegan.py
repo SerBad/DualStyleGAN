@@ -243,8 +243,8 @@ class DualStyleGAN(nn.Module):
         # # print(exstyles)
         # # image.show()
         # image = T.ToPILImage()(image)
-        return T.ToTensor()(image)
-        # return image
+        # return T.ToTensor()(image)
+        return image
 
         # if return_latents:
         #     return image, latent
