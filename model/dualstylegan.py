@@ -96,7 +96,7 @@ class DualStyleGAN(nn.Module):
     def forward(
             self,
             styles,  # intrinsic style code
-            latent,  # extrinsic style code
+            exstyles,  # extrinsic style code
             return_latents=False,
             return_feat=False,
             inject_index=None,
@@ -127,8 +127,7 @@ class DualStyleGAN(nn.Module):
         # interp_weights = interp_weights
 
         styles = [styles]
-        exstyles = self.generator.style(latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
-            latent.shape)
+
         return_latents = False
         return_feat = False
         inject_index = None

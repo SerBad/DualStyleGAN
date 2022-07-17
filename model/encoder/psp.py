@@ -10,7 +10,7 @@ import torch
 from torch import nn
 from model.encoder.encoders import psp_encoders
 from model.stylegan.model import Generator
-
+from torch.nn import functional as F
 
 def get_keys(d, name):
     if 'state_dict' in d:
@@ -71,6 +71,7 @@ class pSp(nn.Module):
 
     def forward(self, x, resize=True, latent_mask=None, input_code=False, randomize_noise=True,
                 inject_latent=None, return_latents=False, alpha=None, z_plus_latent=False, return_z_plus_latent=True):
+
         if input_code:
             codes = x
         else:

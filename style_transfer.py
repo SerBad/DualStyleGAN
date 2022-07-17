@@ -12,6 +12,7 @@ from model.encoder.psp import pSp
 import onnx
 import onnxruntime
 
+
 class TestOptions:
     def __init__(self):
 
@@ -130,30 +131,30 @@ if __name__ == "__main__":
         # F.adaptive_avg_pool2d自适应平均池化函数
         # reconstructed content image and its intrinsic style code
         model = torch.jit.load("head2-copy_model_encoder.jit")
-        instyle = model(F.adaptive_avg_pool2d(I, 256))
-        input_names = ["input"]
-        output_names = ["output"]
-        path = "./head2-copy2_encoder.onnx"
-        torch.onnx.export(model,
-                          F.adaptive_avg_pool2d(I, 256),
-                          path,
-                          verbose=True,
-                          export_params=True,
-                          opset_version=11,
-                          do_constant_folding=True,
-                          input_names=input_names,
-                          output_names=output_names,
-                          keep_initializers_as_inputs=True)
-
-        print(onnx.checker.check_model(onnx.load(path)))
-
-        session = onnxruntime.InferenceSession(path)
-        print("session.get_inputs()", session.get_inputs())
-        for o in session.get_inputs():
-            print(o)
-        for o in session.get_outputs():
-            print("session.get_outputs()", o)
-
+        # instyle = model(F.adaptive_avg_pool2d(I, 256))
+        instyle = model(I)
+        # input_names = ["input"]
+        # output_names = ["output"]
+        # path = "./head2-copy2_encoder.onnx"
+        # torch.onnx.export(model,
+        #                   F.adaptive_avg_pool2d(I, 256),
+        #                   path,
+        #                   verbose=True,
+        #                   export_params=True,
+        #                   opset_version=11,
+        #                   do_constant_folding=True,
+        #                   input_names=input_names,
+        #                   output_names=output_names,
+        #                   keep_initializers_as_inputs=True)
+        #
+        # print(onnx.checker.check_model(onnx.load(path)))
+        #
+        # session = onnxruntime.InferenceSession(path)
+        # print("session.get_inputs()", session.get_inputs())
+        # for o in session.get_inputs():
+        #     print(o)
+        # for o in session.get_outputs():
+        #     print("session.get_outputs()", o)
 
         # instyle = encoder(F.adaptive_avg_pool2d(I, 256) )
 
