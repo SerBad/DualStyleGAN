@@ -387,7 +387,7 @@ class ToRGB(nn.Module):
     def forward(self, input, style, skip=None, externalweight=None):
         out = self.conv(input, style, externalweight)
         out = out + self.bias
-
+        print("ToRGB forward skip", skip, out.shape)
         if skip is not None:
             skip = self.upsample(skip)
 

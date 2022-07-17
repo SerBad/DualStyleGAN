@@ -189,6 +189,7 @@ if __name__ == "__main__":
     print('Generate images successfully!')
 
     save_name = args.name + '_%d_%s' % (args.style_id, os.path.basename(args.content).split('.')[0])
+    print('Generate images successfully!', os.path.join(args.output_path, save_name + '.jpg'))
     save_image(torchvision.utils.make_grid(F.adaptive_avg_pool2d(torch.cat(viz, dim=0), 256), 4, 2).cpu(),
                os.path.join(args.output_path, save_name + '_overview.jpg'))
     save_image(img_gen[0].cpu(), os.path.join(args.output_path, save_name + '.jpg'))

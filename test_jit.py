@@ -9,6 +9,9 @@ from torch.nn import functional as F
 import torchvision
 from model.dualstylegan import DualStyleGAN
 from model.encoder.psp import pSp
+import cv2
+import time
+from PIL import Image
 
 
 class TestOptions:
@@ -50,8 +53,6 @@ class TestOptions:
         return self.opt
 
 
-
-
 if __name__ == "__main__":
     device = "cpu"
 
@@ -61,7 +62,8 @@ if __name__ == "__main__":
 
     generator = torch.jit.load("head2-copy_model.jit")
     # exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
-    exstyles = torch.load("head2-copy_exstyles.pt")
+    # exstyles = torch.load("head2-copy_exstyles.pt")
+    exstyles = torch.load("head2-copy_latent.pt")
     print('Load models successfully!')
 
     # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
@@ -77,16 +79,21 @@ if __name__ == "__main__":
         # print('exstyles.keys()', exstyles.keys())
         # stylename = list(exstyles.keys())[args.style_id]
         # latent = torch.tensor(exstyles[stylename]).to(device)
-
+        tt = time.time()
+        print("开始解析")
         img_gen = generator(instyle, exstyles)
-        img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)
+        print(img_gen)
+        # img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)[0]
         viz += [img_gen]
+        print('time2 end:', time.time() - tt)
 
     print('Generate images successfully!')
 
     save_name = args.name + '_%d_%s' % (args.style_id, os.path.basename(args.content).split('.')[0])
-    save_image(torchvision.utils.make_grid(F.adaptive_avg_pool2d(torch.cat(viz, dim=0), 256), 4, 2).cpu(),
-               os.path.join(args.output_path, save_name + '_overview.jpg'))
+    # save_image(torchvision.utils.make_grid(F.adaptive_avg_pool2d(torch.cat(viz, dim=0), 256), 4, 2).cpu(),
+    #            os.path.join(args.output_path, save_name + '_overview.jpg'))
     save_image(img_gen.cpu(), os.path.join(args.output_path, save_name + '.jpg'))
+    # Image.Image.show(transforms.ToPILImage()(img_gen))
+    # cv2.imwrite(os.path.join(args.output_path, save_name + '.jpg'), transforms.ToPILImage()(img_gen))
 
     print('Save images successfully!')

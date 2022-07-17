@@ -153,21 +153,21 @@ class DualStyleGAN(nn.Module):
             if not z_plus_latent:
                 styles = [self.generator.style(s) for s in styles]
             else:
-                temp = []
-                for s in styles:
-                    shape = s.shape
-                    # [1, 18, 512]
-                    print("输入的值s.shape", s.shape, shape[0] * shape[1], "===", shape[0], shape[1], shape[2])
-                    ss = s.reshape(shape[0] * shape[1], shape[2])
-                    print("输入的值s.shape", s.shape, "输入的值11ss.shape", ss.shape)
-                    ss = self.generator.style(ss)
-                    print("输入的值s.shape", s.shape, "输入的值22ss.shape", ss.shape)
-                    ss = ss.reshape(s.shape)
-                    print("输入的值s.shape", s.shape, "输入的值33ss.shape", ss.shape)
-                    temp.append(ss)
-                styles = temp
-                # styles = [self.generator.style(s.reshape(s.shape[0] * s.shape[1], s.shape[2])).reshape(s.shape) for s in
-                #           styles]
+                # temp = []
+                # for s in styles:
+                #     shape = s.shape
+                #     # [1, 18, 512]
+                #     print("输入的值s.shape", s.shape, shape[0] * shape[1], "===", shape[0], shape[1], shape[2])
+                #     ss = s.reshape(shape[0] * shape[1], shape[2])
+                #     print("输入的值s.shape", s.shape, "输入的值11ss.shape", ss.shape)
+                #     ss = self.generator.style(ss)
+                #     print("输入的值s.shape", s.shape, "输入的值22ss.shape", ss.shape)
+                #     ss = ss.reshape(s.shape)
+                #     print("输入的值s.shape", s.shape, "输入的值33ss.shape", ss.shape)
+                #     temp.append(ss)
+                # styles = temp
+                styles = [self.generator.style(s.reshape(s.shape[0] * s.shape[1], s.shape[2])).reshape(s.shape) for s in
+                          styles]
         print("这里会执行到吗？", "noise", noise, 'randomize_noise', randomize_noise)
         if noise is None:
             if randomize_noise:
@@ -255,29 +255,18 @@ class DualStyleGAN(nn.Module):
 
         image = skip
         print("这里执行到了没？回事因为最后输出的问题吗22？", image)
-        # image = torch.clamp(image.detach(), -1, 1)[0].cpu()
-        # # print(image.shape)
-        # # image = image.to(memory_format=torch.preserve_format)
-        # # image = T.ToTensor()(image)
-        # print(image.layout)
-        # # print(exstyles)
-        # # image.show()
-        # image = T.ToPILImage()(image)
-        # return T.ToTensor()(image)
-        return image
+        image = torch.clamp(image.detach(), -1, 1)[0]
+        print(image.layout)
+        image = ((image.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
+        image = T.ToPILImage("RGB")(image)
+        image.show()
+        return T.ToTensor()(image)
+        # return image
+
 
         # if return_latents:
         #     return image, latent
         # else:
-        #     # image = torch.clamp(image.detach(), -1, 1)[0].cpu()
-        #     # print(image.shape)
-        #     # # image = image.to(memory_format=torch.preserve_format)
-        #     # # image = T.ToTensor()(image)
-        #     # print(image.layout)
-        #     # # print(exstyles)
-        #     # # image.show()
-        #     # image = T.ToPILImage()(image)
-        #     # return T.ToTensor()(image)
         #     return image, None
 
     def make_noise(self):

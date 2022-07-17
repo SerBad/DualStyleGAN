@@ -9,24 +9,30 @@ from torch.nn import functional as F
 import torchvision
 from model.dualstylegan import DualStyleGAN
 from model.encoder.psp import pSp
+import platform
 import onnx
-import onnxruntime
-import netron
 
-if __name__ == "__main__":
+if platform.system() != "Darwin":
+    import onnxruntime
+
+import netron
+import time
+
+
+def trans_onnx():
     device = "cuda"
     root = "/kaggle/input/zhoudualstylegan/DualStyleGAN/"
     generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
-    ckpt = torch.load(root+"checkpoint/head2-copy/generator-001500.pt", map_location=lambda storage, loc: storage)
+    ckpt = torch.load(root + "checkpoint/head2-copy/generator-001500.pt", map_location=lambda storage, loc: storage)
     # netron.start("checkpoint/head2-copy/generator-001500.pt")
 
     # "g_ema"是训练结果保存进去的约定值
     generator.load_state_dict(ckpt["g_ema"])
     generator.eval()
     generator = generator.to(device)
-    exstyles = np.load(root+"checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle='TRUE').item()
+    exstyles = np.load(root + "checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle='TRUE').item()
 
-    model_path = os.path.join(root+'checkpoint', 'encoder.pt')
+    model_path = os.path.join(root + 'checkpoint', 'encoder.pt')
     ckpt = torch.load(model_path, map_location=device)
     opts = ckpt['opts']
     opts['checkpoint_path'] = model_path
@@ -83,7 +89,7 @@ if __name__ == "__main__":
                           do_constant_folding=True,
                           input_names=input_names,
                           output_names=output_names,
-                          keep_initializers_as_inputs=True )
+                          keep_initializers_as_inputs=True)
 
         print(onnx.checker.check_model(onnx.load(path)))
 
@@ -106,3 +112,74 @@ if __name__ == "__main__":
         #                   do_constant_folding=True,
         #                   input_names=['input'],
         #                   output_names=['output'])
+
+
+def trans_onnx_by_jit():
+    device = "cpu"
+
+    generator = torch.jit.load("head2-copy_model.jit")
+    exstyles = torch.load("head2-copy_latent.pt")
+    print('Load models successfully!')
+
+    # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
+    with torch.no_grad():
+        I = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
+        encoder = torch.jit.load("head2-copy_model_encoder.jit")
+        instyle = encoder(I)
+
+        input_names = ["input"]
+        output_names = ["output"]
+        path = "./head2-copy2_model_encoder.onnx"
+        # torch.onnx.export(encoder,
+        #                   I,
+        #                   path,
+        #                   verbose=True,
+        #                   export_params=True,
+        #                   opset_version=16,
+        #                   do_constant_folding=True,
+        #                   input_names=input_names,
+        #                   output_names=output_names,
+        #                   keep_initializers_as_inputs=True)
+        # check_onnx(path)
+        # print(instyle.shape)
+
+        tt = time.time()
+        print("开始解析")
+        # img_gen = generator(instyle, exstyles)
+        # img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)
+        input_names = ["input"]
+        output_names = ["output"]
+        path = "./head2-copy2_model.onnx"
+        torch.onnx.export(generator,
+                          (instyle, exstyles),
+                          path,
+                          verbose=True,
+                          export_params=True,
+                          opset_version=16,
+                          do_constant_folding=True,
+                          input_names=input_names,
+                          output_names=output_names,
+                          keep_initializers_as_inputs=True)
+        print(path, "成功")
+        check_onnx(path)
+
+        print('time2 end:', time.time() - tt)
+
+    print('Save images successfully!')
+
+
+def check_onnx(path: str):
+    print("开始检查onnx", path)
+    onnx.checker.check_model(onnx.load(path))
+    session = onnxruntime.InferenceSession(path)
+    print("session.get_inputs()", session.get_inputs())
+    for o in session.get_inputs():
+        print(o)
+    for o in session.get_outputs():
+        print("session.get_outputs()", o)
+    print("结束检查onnx", path)
+
+
+if __name__ == "__main__":
+    # trans_onnx()
+    trans_onnx_by_jit()

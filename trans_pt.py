@@ -15,12 +15,13 @@ import netron
 from torch.utils.mobile_optimizer import optimize_for_mobile
 from PIL import Image
 import io
+import time
 
 
 def save_jit():
     device = "cpu"
-    root = "/kaggle/input/zhoudualstylegan/DualStyleGAN/"
-    # root = ""
+    # root = "/kaggle/input/zhoudualstylegan/DualStyleGAN/"
+    root = ""
     pt_path = root + "checkpoint/head2-copy/generator-001500.pt"
     # generator = DualStyleGAN()
     generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
@@ -72,10 +73,10 @@ def save_jit():
         # # torch.save(exstyles, './head2-copy_exstyles.pt')
         # # extrinsic styte code
         # print("traced_script_module", "为什么这里什么也没有2？instyle", instyle)
-        traced_script_module = torch.jit.trace(generator, (instyle, latent), check_trace=True)
+        traced_script_module = torch.jit.trace(generator, (instyle, latent), check_trace=False)
         # traced_script_module = torch.jit.trace(generator, (instyle, exstyles), check_trace=True)
         print("traced_script_module", traced_script_module)
-        # traced_script_module.save("head2-copy_model.jit")
+        traced_script_module.save("head2-copy_model.jit")
 
         # traced_script_module_optimized = optimize_for_mobile(traced_script_module, backend='Vulkan')
         # traced_script_module_optimized._save_for_lite_interpreter("head2-copy-mobile_model.ptl")
