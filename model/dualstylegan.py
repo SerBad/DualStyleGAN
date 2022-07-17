@@ -96,7 +96,7 @@ class DualStyleGAN(nn.Module):
     def forward(
             self,
             styles,  # intrinsic style code
-            exstyles,  # extrinsic style code
+            latent,  # extrinsic style code
             return_latents=False,
             return_feat=False,
             inject_index=None,
@@ -140,16 +140,28 @@ class DualStyleGAN(nn.Module):
         use_res = True  # whether to use the extrinsic style path
         fuse_index = 18  # layers > fuse_index do not use the extrinsic style path
         interp_weights = [0.75] * 7 + [1] * 11  # weight vector for style combination of two paths
-
-        for s in styles:
-            print("输入的值", s.shape)
-
+        exstyles = self.generator.style(
+            latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
+            latent.shape)
         if not input_is_latent:
             if not z_plus_latent:
                 styles = [self.generator.style(s) for s in styles]
             else:
-                styles = [self.generator.style(s.reshape(s.shape[0] * s.shape[1], s.shape[2])).reshape(s.shape) for s in
-                          styles]
+                temp = []
+                for s in styles:
+                    shape = s.shape
+                    # [1, 18, 512]
+                    print("输入的值s.shape", s.shape, shape[0] * shape[1], "===", shape[0], shape[1], shape[2])
+                    ss = s.reshape(shape[0] * shape[1], shape[2])
+                    print("输入的值s.shape", s.shape, "输入的值11ss.shape", ss.shape)
+                    ss = self.generator.style(ss)
+                    print("输入的值s.shape", s.shape, "输入的值22ss.shape", ss.shape)
+                    ss = ss.reshape(s.shape)
+                    print("输入的值s.shape", s.shape, "输入的值33ss.shape", ss.shape)
+                    temp.append(ss)
+                styles = temp
+                # styles = [self.generator.style(s.reshape(s.shape[0] * s.shape[1], s.shape[2])).reshape(s.shape) for s in
+                #           styles]
         print("这里会执行到吗？", "noise", noise, 'randomize_noise', randomize_noise)
         if noise is None:
             if randomize_noise:

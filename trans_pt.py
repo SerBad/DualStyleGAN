@@ -49,8 +49,8 @@ def save_jit():
         # instyle = encoder(img)
         # instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
         #                      z_plus_latent=True, return_z_plus_latent=True, resize=False)
-        # instyle = encoder(img)
-        instyle = encoder(F.adaptive_avg_pool2d(img, 256))
+        instyle = encoder(img)
+        # instyle = encoder(F.adaptive_avg_pool2d(img, 256))
         "head2-copy-mobile_model_encoder.ptl"
         # print(instyle.shape)
         # traced_script_module_encoder = torch.jit.trace(encoder, img, check_trace=False)
@@ -63,17 +63,19 @@ def save_jit():
         # print("stylename", stylename)
         # print("exstyles[stylename]", exstyles[stylename])
         latent = torch.tensor(exstyles[stylename]).to(device)
-        # # print("latent", latent)
-        print("traced_script_module", "为什么这里什么也没有1？latent ", latent)
-        exstyles = generator.generator.style(
-            latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
-            latent.shape)
-        # torch.save(exstyles, './head2-copy_exstyles.pt')
-        # extrinsic styte code
-        print("traced_script_module", "为什么这里什么也没有2？instyle", instyle)
-        traced_script_module = torch.jit.trace(generator, (instyle, exstyles), check_trace=True)
+        # # # print("latent", latent)
+        # print("traced_script_module", "为什么这里什么也没有1？latent ", latent)
+        # exstyles = generator.generator.style(
+        #     latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
+        #     latent.shape)
+        # torch.save(latent, './head2-copy_latent.pt')
+        # # torch.save(exstyles, './head2-copy_exstyles.pt')
+        # # extrinsic styte code
+        # print("traced_script_module", "为什么这里什么也没有2？instyle", instyle)
+        traced_script_module = torch.jit.trace(generator, (instyle, latent), check_trace=True)
+        # traced_script_module = torch.jit.trace(generator, (instyle, exstyles), check_trace=True)
         print("traced_script_module", traced_script_module)
-        traced_script_module.save("head2-copy_model.jit")
+        # traced_script_module.save("head2-copy_model.jit")
 
         # traced_script_module_optimized = optimize_for_mobile(traced_script_module, backend='Vulkan')
         # traced_script_module_optimized._save_for_lite_interpreter("head2-copy-mobile_model.ptl")

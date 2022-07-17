@@ -78,7 +78,7 @@ class pSp(nn.Module):
         z_plus_latent = True
         return_z_plus_latent = True
         resize = False
-        # x = F.adaptive_avg_pool2d(x, 256)
+        x = F.adaptive_avg_pool2d(x, 256)
         if input_code:
             codes = x
         else:
@@ -112,7 +112,7 @@ class pSp(nn.Module):
 
         if resize:
             images = self.face_pool(images)
-
+        return codes
         # if return_latents:
         #     if z_plus_latent and return_z_plus_latent:
         #         return images, codes
@@ -121,7 +121,7 @@ class pSp(nn.Module):
         #     else:
         #         return images, result_latent
         # else:
-        return images
+        #     return images
 
     def set_opts(self, opts):
         self.opts = opts

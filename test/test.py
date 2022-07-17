@@ -103,9 +103,17 @@ def for_tes():
         print("s", s)
 
 
+def test_reshape():
+    a = torch.rand(1, 3, 1024, 1024)
+    a_shape = a.shape
+    b = a.reshape(a_shape[0] * a_shape[1], a_shape[2])
+    print(a_shape, b.shape)
+
+
 if __name__ == "__main__":
     # cat()
     # test_tensor()
     # grad_tensor()
     # mean_test()
-    for_tes()
+    # for_tes()
+    test_reshape()
