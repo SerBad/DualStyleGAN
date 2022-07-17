@@ -69,8 +69,11 @@ class DualStyleGAN(nn.Module):
         self.generator = Generator(size, style_dim, n_mlp, channel_multiplier)
         # The extrinsic style path
         self.res = nn.ModuleList()
+        # res_index // 2 * 2的结果是6
         self.res_index = res_index // 2 * 2
+        # AdaResBlock样式网络
         self.res.append(AdaResBlock(self.generator.channels[2 ** 2]))  # for conv1
+        # log_size是9，是512的2的次幂
         for i in range(3, self.generator.log_size + 1):
             out_channel = self.generator.channels[2 ** i]
             if i < 3 + self.res_index // 2:
@@ -81,8 +84,11 @@ class DualStyleGAN(nn.Module):
                 # structure transform block T_s
                 self.res.append(EqualLinear(512, 512))
                 # FC layer is initialized with identity matrices, meaning no changes to the input latent code
+                # https://wizardforcel.gitbooks.io/learn-dl-with-pytorch-liaoxingyu/content/3.5.html
+                # 添加初始化参数
                 self.res[-1].weight.data = torch.eye(512) * 512.0 ** 0.5 + torch.randn(512, 512) * 0.01
                 self.res.append(EqualLinear(512, 512))
+                # [-1]表示取list中最后一个元素
                 self.res[-1].weight.data = torch.eye(512) * 512.0 ** 0.5 + torch.randn(512, 512) * 0.01
         self.res.append(EqualLinear(512, 512))  # for to_rgb7
         self.res[-1].weight.data = torch.eye(512) * 512.0 ** 0.5 + torch.randn(512, 512) * 0.01

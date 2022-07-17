@@ -11,7 +11,11 @@ from torchvision import transforms
 
 import torchvision
 import onnx
-import onnxruntime
+import platform
+
+if platform.system() != "Darwin":
+    import onnxruntime
+
 import netron
 
 
@@ -147,6 +151,23 @@ def test_net2():
         print("session.get_outputs()", o)
 
 
+def test():
+    net = Net2()
+    input = torch.randn(1, )
+    net.weight.data = input
+
+    for p in net.parameters():
+        print("net.parameters()", p.weight.data)
+
+    for p in net.named_parameters():
+        print("net.named_parameters()", p[0])
+
+    for p in net.named_children():
+        print("net.named_children()", p)
+
+
 if __name__ == "__main__":
     torch.set_printoptions(profile='full')
-    test_net2()
+    test()
+    # test_net()
+    # test_net2()

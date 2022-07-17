@@ -1,5 +1,7 @@
 import torch
 import math
+import torch.nn as nn
+from typing import Any, Dict, Iterable, Iterator, Mapping, Optional, overload, Tuple, TypeVar, Union
 
 
 # 拼接的方法
@@ -93,14 +95,23 @@ def mean_test():
 def for_tes():
     data = [3, 7, 9, 5, 6, 7, 6, 1]
 
-    def add(s: int) -> int:
+    # Union[int, str] 表示既可以是int，也可以str
+    # https://docs.python.org/zh-cn/3/library/typing.html#typing.Union
+    def add(s: int) -> Union[int, str, nn.Sequential]:
         return s + s
 
     # for循环的一种简单方式
     result = [add(s) for s in data]
 
+    result.append(11)
     for s in result:
-        print("s", s)
+        print("s1", s)
+
+    result[-1] = 10
+    for s in result:
+        print("s2", s)
+
+    print(math.log(512, 2), "res_index // 2 * 2", 6 // 2 * 2)
 
 
 def test_reshape():

@@ -136,9 +136,11 @@ class EqualLinear(nn.Module):
     ):
         super().__init__()
 
+        # 权重
         self.weight = nn.Parameter(torch.randn(out_dim, in_dim).div_(lr_mul))
 
         if bias:
+            # 偏置
             self.bias = nn.Parameter(torch.zeros(out_dim).fill_(bias_init))
 
         else:
