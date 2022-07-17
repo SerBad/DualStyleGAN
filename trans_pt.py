@@ -49,7 +49,8 @@ def save_jit():
         # instyle = encoder(img)
         # instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
         #                      z_plus_latent=True, return_z_plus_latent=True, resize=False)
-        instyle = encoder(img)
+        # instyle = encoder(img)
+        instyle = encoder(F.adaptive_avg_pool2d(img, 256))
         "head2-copy-mobile_model_encoder.ptl"
         # print(instyle.shape)
         traced_script_module_encoder = torch.jit.trace(encoder, img, check_trace=False)

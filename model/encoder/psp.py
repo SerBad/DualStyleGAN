@@ -78,7 +78,7 @@ class pSp(nn.Module):
         z_plus_latent = True
         return_z_plus_latent = True
         resize = False
-        x = F.adaptive_avg_pool2d(x, 256)
+        # x = F.adaptive_avg_pool2d(x, 256)
         if input_code:
             codes = x
         else:
