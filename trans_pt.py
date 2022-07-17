@@ -47,8 +47,8 @@ def save_jit():
         img = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
         # img = F.adaptive_avg_pool2d(img, 256)
         # instyle = encoder(img)
-        instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=False,
-                          z_plus_latent=True, return_z_plus_latent=True, resize=False)
+        _, instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
+                             z_plus_latent=True, return_z_plus_latent=True, resize=False)
         "head2-copy-mobile_model_encoder.ptl"
 
         # traced_script_module_encoder = torch.jit.trace(encoder, img, check_trace=False)
