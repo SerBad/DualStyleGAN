@@ -12,6 +12,7 @@ from model.encoder.encoders import psp_encoders
 from model.stylegan.model import Generator
 from torch.nn import functional as F
 
+
 def get_keys(d, name):
     if 'state_dict' in d:
         d = d['state_dict']
@@ -72,6 +73,12 @@ class pSp(nn.Module):
     def forward(self, x, resize=True, latent_mask=None, input_code=False, randomize_noise=True,
                 inject_latent=None, return_latents=False, alpha=None, z_plus_latent=False, return_z_plus_latent=True):
 
+        randomize_noise = False
+        return_latents = True
+        z_plus_latent = True
+        return_z_plus_latent = True
+        resize = False
+        x = F.adaptive_avg_pool2d(x, 256)
         if input_code:
             codes = x
         else:
@@ -106,15 +113,15 @@ class pSp(nn.Module):
         if resize:
             images = self.face_pool(images)
 
-        if return_latents:
-            if z_plus_latent and return_z_plus_latent:
-                return images, codes
-            if z_plus_latent and not return_z_plus_latent:
-                return images, result_latent
-            else:
-                return images, result_latent
-        else:
-            return images
+        # if return_latents:
+        #     if z_plus_latent and return_z_plus_latent:
+        #         return images, codes
+        #     if z_plus_latent and not return_z_plus_latent:
+        #         return images, result_latent
+        #     else:
+        #         return images, result_latent
+        # else:
+        return images
 
     def set_opts(self, opts):
         self.opts = opts

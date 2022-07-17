@@ -47,12 +47,13 @@ def save_jit():
         img = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
         # img = F.adaptive_avg_pool2d(img, 256)
         # instyle = encoder(img)
-        _, instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
-                             z_plus_latent=True, return_z_plus_latent=True, resize=False)
+        # instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
+        #                      z_plus_latent=True, return_z_plus_latent=True, resize=False)
+        instyle = encoder(img)
         "head2-copy-mobile_model_encoder.ptl"
-
-        # traced_script_module_encoder = torch.jit.trace(encoder, img, check_trace=False)
-        # traced_script_module_encoder.save("head2-copy_model_encoder.jit")
+        # print(instyle.shape)
+        traced_script_module_encoder = torch.jit.trace(encoder, img, check_trace=False)
+        traced_script_module_encoder.save("head2-copy_model_encoder.jit")
         # traced_script_module_optimized_encoder = optimize_for_mobile(traced_script_module_encoder, backend='Vulkan')
         # traced_script_module_optimized_encoder = optimize_for_mobile(traced_script_module_encoder)
         # traced_script_module_optimized_encoder._save_for_lite_interpreter("head2-copy-mobile_model_encoder.ptl")
@@ -61,12 +62,12 @@ def save_jit():
         # print("stylename", stylename)
         # print("exstyles[stylename]", exstyles[stylename])
         latent = torch.tensor(exstyles[stylename]).to(device)
-        # print("latent", latent)
+        # # print("latent", latent)
         print("traced_script_module", "为什么这里什么也没有1？latent ", latent)
         exstyles = generator.generator.style(
             latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
             latent.shape)
-        # torch.save(exstyles, './head2-copy_exstyles.pt')
+        torch.save(exstyles, './head2-copy_exstyles.pt')
         # extrinsic styte code
         print("traced_script_module", "为什么这里什么也没有2？instyle", instyle)
         traced_script_module = torch.jit.trace(generator, (instyle, exstyles), check_trace=True)

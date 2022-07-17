@@ -141,6 +141,9 @@ class DualStyleGAN(nn.Module):
         fuse_index = 18  # layers > fuse_index do not use the extrinsic style path
         interp_weights = [0.75] * 7 + [1] * 11  # weight vector for style combination of two paths
 
+        for s in styles:
+            print("输入的值", s.shape)
+
         if not input_is_latent:
             if not z_plus_latent:
                 styles = [self.generator.style(s) for s in styles]

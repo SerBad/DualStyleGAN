@@ -59,9 +59,9 @@ if __name__ == "__main__":
     args = parser.parse()
     print('*' * 98)
 
-    generator = torch.jit.load("head2-copy_model (1).jit")
-    exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
-
+    generator = torch.jit.load("head2-copy_model.jit")
+    # exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
+    exstyles = torch.load("head2-copy_exstyles.pt")
     print('Load models successfully!')
 
     # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
@@ -70,14 +70,15 @@ if __name__ == "__main__":
         I = load_image(args.content).to(device)
         viz += [I]
 
-        instyle = torch.jit.load("head2-copy_model_encoder.jit")(F.adaptive_avg_pool2d(I, 256))
+        # instyle = torch.jit.load("head2-copy_model_encoder.jit")(F.adaptive_avg_pool2d(I, 256))
+        instyle = torch.jit.load("head2-copy_model_encoder.jit")(I)
 
+        print(instyle.shape)
+        # print('exstyles.keys()', exstyles.keys())
+        # stylename = list(exstyles.keys())[args.style_id]
+        # latent = torch.tensor(exstyles[stylename]).to(device)
 
-        print('exstyles.keys()', exstyles.keys())
-        stylename = list(exstyles.keys())[args.style_id]
-        latent = torch.tensor(exstyles[stylename]).to(device)
-
-        img_gen = generator(instyle, latent)
+        img_gen = generator(instyle, exstyles)
         img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)
         viz += [img_gen]
 
