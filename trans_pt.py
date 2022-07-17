@@ -47,7 +47,7 @@ def save_jit():
         img = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
         # img = F.adaptive_avg_pool2d(img, 256)
         # instyle = encoder(img)
-        instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=True,
+        instyle = encoder(F.adaptive_avg_pool2d(img, 256), randomize_noise=False, return_latents=False,
                           z_plus_latent=True, return_z_plus_latent=True, resize=False)
         "head2-copy-mobile_model_encoder.ptl"
 
@@ -62,13 +62,13 @@ def save_jit():
         # print("exstyles[stylename]", exstyles[stylename])
         latent = torch.tensor(exstyles[stylename]).to(device)
         # print("latent", latent)
-        print("traced_script_module", "为什么这里什么也没有1？", latent)
+        print("traced_script_module", "为什么这里什么也没有1？latent ", latent)
         exstyles = generator.generator.style(
             latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
             latent.shape)
         # torch.save(exstyles, './head2-copy_exstyles.pt')
         # extrinsic styte code
-        print("traced_script_module", "为什么这里什么也没有2？", instyle)
+        print("traced_script_module", "为什么这里什么也没有2？instyle", instyle)
         traced_script_module = torch.jit.trace(generator, (instyle, exstyles), check_trace=True)
         print("traced_script_module", traced_script_module)
         traced_script_module.save("head2-copy_model.jit")
