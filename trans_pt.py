@@ -19,8 +19,8 @@ import io
 
 def save_jit():
     device = "cpu"
-    # root = "/kaggle/input/zhoudualstylegan/DualStyleGAN/"
-    root = ""
+    root = "/kaggle/input/zhoudualstylegan/DualStyleGAN/"
+    # root = ""
     pt_path = root + "checkpoint/head2-copy/generator-001500.pt"
     # generator = DualStyleGAN()
     generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
