@@ -112,16 +112,19 @@ class pSp(nn.Module):
 
         if resize:
             images = self.face_pool(images)
-        return codes
-        # if return_latents:
-        #     if z_plus_latent and return_z_plus_latent:
-        #         return images, codes
-        #     if z_plus_latent and not return_z_plus_latent:
-        #         return images, result_latent
-        #     else:
-        #         return images, result_latent
-        # else:
-        #     return images
+
+        # 在DualStyleGAN，其实只用到了这里导出的latent code，在导出网络的时候，只用这个就可以了。
+        # return codes
+
+        if return_latents:
+            if z_plus_latent and return_z_plus_latent:
+                return images, codes
+            if z_plus_latent and not return_z_plus_latent:
+                return images, result_latent
+            else:
+                return images, result_latent
+        else:
+            return images, None
 
     def set_opts(self, opts):
         self.opts = opts

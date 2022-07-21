@@ -10,7 +10,10 @@ import torchvision
 from model.dualstylegan import DualStyleGAN
 from model.encoder.psp import pSp
 import onnx
-import onnxruntime
+import platform
+
+if platform.system() != "Darwin":
+    import onnxruntime
 import netron
 from torch.utils.mobile_optimizer import optimize_for_mobile
 from PIL import Image

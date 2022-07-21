@@ -102,7 +102,8 @@ class DualStyleGAN(nn.Module):
     def forward(
             self,
             styles,  # intrinsic style code
-            latent,  # extrinsic style code
+            exstyles,  # extrinsic style code
+            # latent,  # extrinsic style code
             return_latents=False,
             return_feat=False,
             inject_index=None,
@@ -117,38 +118,25 @@ class DualStyleGAN(nn.Module):
             interp_weights=[1] * 18,  # weight vector for style combination of two paths
     ):
         print("这里会执行到吗？", "input_is_latent", input_is_latent, z_plus_latent)
-        # styles = styles
-        # exstyles = exstyles
-        # return_latents = return_latents.item()
-        # return_feat = return_feat.item()
-        # inject_index = inject_index
-        # truncation = truncation.item()
-        # truncation_latent = truncation_latent.item()
-        # input_is_latent = input_is_latent.item()
-        # noise = noise
-        # randomize_noise = randomize_noise.item()
-        # z_plus_latent = z_plus_latent.item()
-        # use_res = use_res.item()
-        # fuse_index = fuse_index.item()
-        # interp_weights = interp_weights
 
-        styles = [styles]
+        # 为了实验导出模型，所以固定以下参数
+        # styles = [styles]
+        # return_latents = False
+        # return_feat = False
+        # inject_index = None
+        # truncation = 0.75
+        # truncation_latent = 0
+        # input_is_latent = False
+        # noise = None
+        # randomize_noise = True
+        # z_plus_latent = True  # intrinsic style code is z+ or z
+        # use_res = True  # whether to use the extrinsic style path
+        # fuse_index = 18  # layers > fuse_index do not use the extrinsic style path
+        # interp_weights = [0.75] * 7 + [1] * 11  # weight vector for style combination of two paths
+        # exstyles = self.generator.style(
+        #     latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
+        #     latent.shape)
 
-        return_latents = False
-        return_feat = False
-        inject_index = None
-        truncation = 0.75
-        truncation_latent = 0
-        input_is_latent = False
-        noise = None
-        randomize_noise = True
-        z_plus_latent = True  # intrinsic style code is z+ or z
-        use_res = True  # whether to use the extrinsic style path
-        fuse_index = 18  # layers > fuse_index do not use the extrinsic style path
-        interp_weights = [0.75] * 7 + [1] * 11  # weight vector for style combination of two paths
-        exstyles = self.generator.style(
-            latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
-            latent.shape)
         if not input_is_latent:
             if not z_plus_latent:
                 styles = [self.generator.style(s) for s in styles]
@@ -255,19 +243,18 @@ class DualStyleGAN(nn.Module):
 
         image = skip
         print("这里执行到了没？回事因为最后输出的问题吗22？", image)
-        image = torch.clamp(image.detach(), -1, 1)[0]
-        print(image.layout)
-        image = ((image.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
-        image = T.ToPILImage("RGB")(image)
-        image.show()
-        return T.ToTensor()(image)
-        # return image
+        # 为了导出网络，使结果返回一个正常的image
+        # image = torch.clamp(image.detach(), -1, 1)[0]
+        # print(image.layout)
+        # image = ((image.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
+        # image = T.ToPILImage("RGB")(image)
+        # image.show()
+        # return T.ToTensor()(image)
 
-
-        # if return_latents:
-        #     return image, latent
-        # else:
-        #     return image, None
+        if return_latents:
+            return image, latent
+        else:
+            return image, None
 
     def make_noise(self):
         return self.generator.make_noise()
