@@ -121,10 +121,24 @@ def test_reshape():
     print(a_shape, b.shape)
 
 
+def test_tensor_operation():
+    a = torch.tensor([1.0, 2.0, 3.0])
+    print("原始的", a)
+    # 除法
+    a.div_(0.5)
+    print("div_后", a)
+    a = torch.div(a, 0.5)
+    print("torch.div_后", a)
+    a.fill_(2.0)
+    print("fill__后", a)
+    a = torch.fill_(a, 3.0)
+    print("torch.fill后", a)
+
 if __name__ == "__main__":
     # cat()
     # test_tensor()
     # grad_tensor()
     # mean_test()
     # for_tes()
-    test_reshape()
+    # test_reshape()
+    test_tensor_operation()

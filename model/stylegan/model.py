@@ -7,7 +7,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.autograd import Function
-
+from torchvision.models import mobilenetv3
 from model.stylegan.op import FusedLeakyReLU, fused_leaky_relu, upfirdn2d, conv2d_gradfix
 
 
@@ -132,10 +132,10 @@ class EqualConv2d(nn.Module):
 
 class EqualLinear(nn.Module):
     def __init__(
-            self, in_dim, out_dim, bias=True, bias_init=0, lr_mul=1, activation=None
+            self, in_dim, out_dim, bias=True, bias_init=0, lr_mul=1.0, activation=None
     ):
         super().__init__()
-
+        # div_表示除法
         # 权重
         self.weight = nn.Parameter(torch.randn(out_dim, in_dim).div_(lr_mul))
 
@@ -396,6 +396,7 @@ class ToRGB(nn.Module):
         return out
 
 
+# https://github.com/rosinality/stylegan2-pytorch/blob/master/model.py
 class Generator(nn.Module):
     def __init__(
             self,
