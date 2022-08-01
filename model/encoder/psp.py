@@ -36,6 +36,7 @@ class pSp(nn.Module):
         self.load_weights()
 
     def set_encoder(self):
+        print("self.opts.encoder_type ", self.opts.encoder_type)
         if self.opts.encoder_type == 'GradualStyleEncoder':
             encoder = psp_encoders.GradualStyleEncoder(50, 'ir_se', self.opts)
         elif self.opts.encoder_type == 'BackboneEncoderUsingLastLayerIntoW':

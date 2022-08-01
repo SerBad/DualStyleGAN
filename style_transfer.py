@@ -11,6 +11,8 @@ from model.dualstylegan import DualStyleGAN
 from model.encoder.psp import pSp
 import onnx
 import onnxruntime
+from model.encoder.encoders import psp_encoders
+from torch.utils.mobile_optimizer import optimize_for_mobile
 
 
 class TestOptions:
@@ -106,9 +108,9 @@ if __name__ == "__main__":
     opts['checkpoint_path'] = model_path
     opts = Namespace(**opts)
     opts.device = device
-    # encoder = pSp(opts)
-    # encoder.eval()
-    # encoder.to(device)
+    encoder = pSp(opts)
+    encoder.eval()
+    encoder.to(device)
 
     # 来源于destylize.py保存下来的exstyle_code.npy
     # 使用encode，也就是pSp处理之后返回的style code z^+_e的集合
@@ -126,38 +128,51 @@ if __name__ == "__main__":
         else:
             I = load_image(args.content).to(device)
         viz += [I]
+        I = load_image(args.content).to(device)
+        print("IIIII", I.shape)
         # img_rec, instyle = encoder(F.adaptive_avg_pool2d(I, 256), randomize_noise=False, return_latents=True,
         #                            z_plus_latent=True, return_z_plus_latent=True, resize=False)
         # F.adaptive_avg_pool2d自适应平均池化函数
         # reconstructed content image and its intrinsic style code
-        model = torch.jit.load("head2-copy_model_encoder.jit")
-        # instyle = model(F.adaptive_avg_pool2d(I, 256))
-        instyle = model(I)
+        model = torch.jit.load(
+            "/home/zhou/Documents/python/hyperstyle/head2-copy_model_encoder_only.jit")
+        instyle = model(F.adaptive_avg_pool2d(I, 256))
+        # instyle = model(I)
+        print("I.shape", I.shape)
+        # instyle = generator.style(F.adaptive_avg_pool2d(I.reshape(I.shape[0] * I.shape[1], I.shape[2], I.shape[3]),512))
+        # encoder = psp_encoders.GradualStyleEncoder(50, 'ir_se', opts)
+        # d = torch.load("checkpoint/encoder.pt", map_location='cpu')
+        # d = d['state_dict']
+        # name = "encoder"
+        # d_filt = {k[len(name) + 1:]: v for k, v in d.items() if k[:len(name)] == name}
+        # encoder.load_state_dict(d_filt, strict=True)
+        # # instyle = encoder.encoder(F.adaptive_avg_pool2d(I, 256))
+        # instyle = encoder(F.adaptive_avg_pool2d(I, 256))
+
+        # print("instyle ,", instyle.shape, " == ", instyle[0:1, 10:14, 0:512].shape)
+        # instyle = torch.cat((instyle, instyle[0:1, 6:10, 0:512]), dim=1)
+
+        print("instyle ,", instyle.shape)
+        #
         # input_names = ["input"]
         # output_names = ["output"]
-        # path = "./head2-copy2_encoder.onnx"
-        # torch.onnx.export(model,
+        # path = "./head2-copy_model_encoder_only.onnx"
+        # torch.onnx.export(encoder,
         #                   F.adaptive_avg_pool2d(I, 256),
         #                   path,
         #                   verbose=True,
         #                   export_params=True,
-        #                   opset_version=11,
+        #                   opset_version=16,
         #                   do_constant_folding=True,
         #                   input_names=input_names,
         #                   output_names=output_names,
         #                   keep_initializers_as_inputs=True)
-        #
-        # print(onnx.checker.check_model(onnx.load(path)))
-        #
-        # session = onnxruntime.InferenceSession(path)
-        # print("session.get_inputs()", session.get_inputs())
-        # for o in session.get_inputs():
-        #     print(o)
-        # for o in session.get_outputs():
-        #     print("session.get_outputs()", o)
 
-        # instyle = encoder(F.adaptive_avg_pool2d(I, 256) )
-
+        # traced_script_module_encoder = torch.jit.trace(encoder, F.adaptive_avg_pool2d(I, 256), check_trace=False)
+        # traced_script_module_encoder.save("head2-copy_model_encoder_only.jit")
+        #
+        # optimized_scripted_module = optimize_for_mobile(torch.jit.load("head2-copy_model_encoder_only.jit"), backend='cpu')
+        # optimized_scripted_module._save_for_lite_interpreter("head2-copy_model_encoder_only.pkl")
         # img_rec = torch.clamp(img_rec.detach(), -1, 1)
         # viz += [img_rec]
         print('exstyles.keys()', exstyles.keys())

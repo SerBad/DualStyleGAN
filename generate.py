@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from util import save_image
+from util import save_image, load_image
 import argparse
 from model.dualstylegan import DualStyleGAN
 from model.sampler.icp import ICPTrainer
@@ -11,7 +11,7 @@ class TestOptions():
     def __init__(self):
         self.parser = argparse.ArgumentParser(description="Random Artistic Portrait Generation")
         self.parser.add_argument("--batch", type=int, default=8, help="number of generated images")
-        self.parser.add_argument("--style", type=str, default='simpsons', help="target style type")
+        self.parser.add_argument("--style", type=str, default='head2-copy', help="target style type")
         self.parser.add_argument("--truncation", type=float, default=0.5,
                                  help="truncation for intrinsic style code (content)")
         self.parser.add_argument("--weight", type=float, nargs=18, default=[0.75] * 7 + [1] * 11,
@@ -24,9 +24,9 @@ class TestOptions():
         self.parser.add_argument("--fix_structure", action="store_true",
                                  help="using a fixed extrinsic structure code (style")
         self.parser.add_argument("--model_path", type=str, default='./checkpoint/', help="path of the saved models")
-        self.parser.add_argument("--model_name", type=str, default='generator-pretrain.pt',
+        self.parser.add_argument("--model_name", type=str, default='generator-001500.pt',
                                  help="name of the saved dualstylegan")
-        self.parser.add_argument("--output_path", type=str, default='./output/', help="path of the output images")
+        self.parser.add_argument("--output_path", type=str, default='./output-test/', help="path of the output images")
         self.parser.add_argument("--sampler_name", type=str, default='sampler.pt',
                                  help="name of the saved sampling network")
 
@@ -64,6 +64,8 @@ if __name__ == "__main__":
     icpts.icp.netT = icpts.icp.netT.to(device)
 
     print('Load models successfully!')
+    # args.fix_color = True
+    # args.fix_structure = True
 
     with torch.no_grad():
         instyle = torch.randn(args.batch, 512).to(device)
@@ -71,7 +73,7 @@ if __name__ == "__main__":
         res_in = icpts.icp.netT(torch.randn(args.batch, 128).to(device)).reshape(-1, 7, 512)
         # sample color codes
         ada_in = icptc.icp.netT(torch.randn(args.batch, 128).to(device)).reshape(-1, 11, 512)
-
+        print("res_in1", res_in.shape, "ada_in", ada_in.shape, "args.batch", args.batch)
         if args.fix_content:
             instyle = instyle[0:1].repeat(args.batch, 1)
         if args.fix_color:
@@ -79,7 +81,12 @@ if __name__ == "__main__":
         if args.fix_structure:
             res_in = res_in[0:1].repeat(args.batch, 1, 1)
         # concatenate two codes to form the complete extrinsic style code
+        print("res_in2", res_in.shape, "ada_in", ada_in.shape)
         latent = torch.cat((res_in, ada_in), dim=1)
+        print("latent1", latent.shape)
+        # I = load_image("data/content/unsplash-rDEOVtE7vOs.jpg").to(device)
+        # latent = icpts.icp.netT(I)
+        # print("latent2", latent.shape)
         # map into W+ space
         exstyle = generator.generator.style(latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
             latent.shape)

@@ -103,7 +103,6 @@ class DualStyleGAN(nn.Module):
             self,
             styles,  # intrinsic style code
             exstyles,  # extrinsic style code
-            # latent,  # extrinsic style code
             return_latents=False,
             return_feat=False,
             inject_index=None,
@@ -118,9 +117,8 @@ class DualStyleGAN(nn.Module):
             interp_weights=[1] * 18,  # weight vector for style combination of two paths
     ):
         print("这里会执行到吗？", "input_is_latent", input_is_latent, z_plus_latent)
-
-        # 为了实验导出模型，所以固定以下参数
         # styles = [styles]
+        #
         # return_latents = False
         # return_feat = False
         # inject_index = None
@@ -243,13 +241,14 @@ class DualStyleGAN(nn.Module):
 
         image = skip
         print("这里执行到了没？回事因为最后输出的问题吗22？", image)
-        # 为了导出网络，使结果返回一个正常的image
-        # image = torch.clamp(image.detach(), -1, 1)[0]
-        # print(image.layout)
-        # image = ((image.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
-        # image = T.ToPILImage("RGB")(image)
-        # image.show()
-        # return T.ToTensor()(image)
+        # # image = torch.clamp(image.detach(), -1, 1)[0]
+        # # print(image.layout)
+        # # image = ((image.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
+        # # image = T.ToPILImage("RGB")(image)
+        # # image.show()
+        # # return T.ToTensor()(image)
+        # return image
+
 
         if return_latents:
             return image, latent

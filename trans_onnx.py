@@ -124,34 +124,15 @@ def trans_onnx_by_jit():
     # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
     with torch.no_grad():
         I = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
-        encoder = torch.jit.load("head2-copy_model_encoder.jit")
+        I = F.adaptive_avg_pool2d(I, 512)
+        encoder = torch.jit.load("/home/zhou/Documents/python/hyperstyle/head2-copy_model_encoder_only.jit")
         instyle = encoder(I)
 
         input_names = ["input"]
         output_names = ["output"]
         path = "./head2-copy2_model_encoder.onnx"
-        # torch.onnx.export(encoder,
-        #                   I,
-        #                   path,
-        #                   verbose=True,
-        #                   export_params=True,
-        #                   opset_version=16,
-        #                   do_constant_folding=True,
-        #                   input_names=input_names,
-        #                   output_names=output_names,
-        #                   keep_initializers_as_inputs=True)
-        # check_onnx(path)
-        # print(instyle.shape)
-
-        tt = time.time()
-        print("开始解析")
-        # img_gen = generator(instyle, exstyles)
-        # img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)
-        input_names = ["input"]
-        output_names = ["output"]
-        path = "./head2-copy2_model.onnx"
-        torch.onnx.export(generator,
-                          (instyle, exstyles),
+        torch.onnx.export(encoder,
+                          I,
                           path,
                           verbose=True,
                           export_params=True,
@@ -160,8 +141,28 @@ def trans_onnx_by_jit():
                           input_names=input_names,
                           output_names=output_names,
                           keep_initializers_as_inputs=True)
-        print(path, "成功")
         check_onnx(path)
+        print(instyle.shape)
+
+        tt = time.time()
+        # print("开始解析")
+        # # img_gen = generator(instyle, exstyles)
+        # # img_gen = torch.clamp(img_gen.detach(), -1, 1).to(device)
+        # input_names = ["input"]
+        # output_names = ["output"]
+        # path = "./head2-copy2_model.onnx"
+        # torch.onnx.export(generator,
+        #                   (instyle, exstyles),
+        #                   path,
+        #                   verbose=True,
+        #                   export_params=True,
+        #                   opset_version=16,
+        #                   do_constant_folding=True,
+        #                   input_names=input_names,
+        #                   output_names=output_names,
+        #                   keep_initializers_as_inputs=True)
+        # print(path, "成功")
+        # check_onnx(path)
 
         print('time2 end:', time.time() - tt)
 
@@ -183,3 +184,4 @@ def check_onnx(path: str):
 if __name__ == "__main__":
     # trans_onnx()
     trans_onnx_by_jit()
+    # check_onnx("./head2-copy_model_encoder_only.onnx")
