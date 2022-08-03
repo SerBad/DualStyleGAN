@@ -17,6 +17,7 @@ if platform.system() != "Darwin":
     import onnxruntime
 
 import netron
+from torchviz import make_dot
 
 
 class Net(nn.Module):
@@ -166,8 +167,32 @@ def test():
         print("net.named_children()", p)
 
 
+def test_vis1():
+    input = torch.randn(1, 1, 32, 32)
+    net = Net()
+    y = net(input)  # 获取网络的预测值
+    myConvNetVis = make_dot(y, params=dict(list(net.named_parameters()) + [('input', input)]))
+    myConvNetVis.format = "png"
+    # 指定文件生成的文件夹
+    myConvNetVis.directory = "data"
+    # 生成文件
+    myConvNetVis.view(filename="net")
+
+def test_vis2():
+    input = torch.randn(1, )
+    net = Net2()
+    y = net(input)  # 获取网络的预测值
+    myConvNetVis = make_dot(y, params=dict(list(net.named_parameters()) + [('input', input)]))
+    myConvNetVis.format = "png"
+    # 指定文件生成的文件夹
+    myConvNetVis.directory = "data"
+    # 生成文件
+    myConvNetVis.view(filename="net2")
+
 if __name__ == "__main__":
     torch.set_printoptions(profile='full')
-    test()
+    # test()
     # test_net()
     # test_net2()
+    test_vis1()
+    test_vis2()
