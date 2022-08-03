@@ -515,8 +515,8 @@ if __name__ == "__main__":
     if 'output_size' not in opts:
         opts['output_size'] = 1024
     opts = Namespace(**opts)
-    encoder = pSp(opts).to(device).eval()
-    encoder.latent_avg = encoder.latent_avg.to(device)
+    # encoder = pSp(opts).to(device).eval()
+    # encoder.latent_avg = encoder.latent_avg.to(device)
     vggloss = VGG19().to(device).eval()
     id_loss = id_loss.IDLoss(args.identity_path).to(device).eval()
 
