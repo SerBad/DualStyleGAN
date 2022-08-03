@@ -134,8 +134,8 @@ if __name__ == "__main__":
         #                            z_plus_latent=True, return_z_plus_latent=True, resize=False)
         # F.adaptive_avg_pool2d自适应平均池化函数
         # reconstructed content image and its intrinsic style code
-        model = torch.jit.load(
-            "/home/zhou/Documents/python/hyperstyle/head2-copy_model_encoder_only.jit")
+        model = torch.jit.load("checkpoint/faces_w_encoder.jit")
+        print("IIIII",F.adaptive_avg_pool2d(I, 256).shape)
         instyle = model(F.adaptive_avg_pool2d(I, 256))
         # instyle = model(I)
         print("I.shape", I.shape)

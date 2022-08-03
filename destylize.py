@@ -17,34 +17,38 @@ from model.stylegan.model import Generator
 from model.stylegan import lpips
 from model.encoder.psp import pSp
 from model.encoder.criteria import id_loss
+import netron
+
 
 class TestOptions():
     def __init__(self):
-
         self.parser = argparse.ArgumentParser(description="Facial Destylization")
         self.parser.add_argument("style", type=str, help="target style type")
-        self.parser.add_argument("--truncation", type=float, default=0.7, help="truncation for intrinsic style code (content)")
+        self.parser.add_argument("--truncation", type=float, default=0.7,
+                                 help="truncation for intrinsic style code (content)")
         self.parser.add_argument("--model_path", type=str, default='./checkpoint/', help="path of the saved models")
-        self.parser.add_argument("--model_name", type=str, default='fintune-000600.pt', help="name of the saved fine-tuned model")
+        self.parser.add_argument("--model_name", type=str, default='fintune-000600.pt',
+                                 help="name of the saved fine-tuned model")
         self.parser.add_argument("--data_path", type=str, default='./data/', help="path of dataset")
         self.parser.add_argument("--iter", type=int, default=300, help="total training iterations")
         self.parser.add_argument("--batch", type=int, default=1, help="batch size")
 
-
     def parse(self):
-        self.opt = self.parser.parse_args()        
+        self.opt = self.parser.parse_args()
         args = vars(self.opt)
         print('Load options')
         for name, value in sorted(args.items()):
             print('%s: %s' % (str(name), str(value)))
         return self.opt
-    
+
+
 def get_lr(t, initial_lr, rampdown=0.25, rampup=0.05):
     lr_ramp = min(1, (1 - t) / rampdown)
     lr_ramp = 0.5 - 0.5 * math.cos(lr_ramp * math.pi)
     lr_ramp = lr_ramp * min(1, t / rampup)
 
     return initial_lr * lr_ramp
+
 
 def noise_regularize(noises):
     loss = 0
@@ -54,9 +58,9 @@ def noise_regularize(noises):
 
         while True:
             loss = (
-                loss
-                + (noise * torch.roll(noise, shifts=1, dims=3)).mean().pow(2)
-                + (noise * torch.roll(noise, shifts=1, dims=2)).mean().pow(2)
+                    loss
+                    + (noise * torch.roll(noise, shifts=1, dims=3)).mean().pow(2)
+                    + (noise * torch.roll(noise, shifts=1, dims=2)).mean().pow(2)
             )
 
             if size <= 8:
@@ -68,23 +72,25 @@ def noise_regularize(noises):
 
     return loss
 
+
 def noise_normalize_(noises):
     for noise in noises:
         mean = noise.mean()
         std = noise.std()
 
         noise.data.add_(-mean).div_(std)
-        
+
+
 if __name__ == "__main__":
     device = "cuda"
 
     parser = TestOptions()
     args = parser.parse()
-    print('*'*50)
-    
-    if not os.path.exists("log/%s/destylization/"%(args.style)):
-        os.makedirs("log/%s/destylization/"%(args.style))
-        
+    print('*' * 50)
+    args.style = args.style + str(3)
+    if not os.path.exists("log/%s/destylization/" % (args.style)):
+        os.makedirs("log/%s/destylization/" % (args.style))
+
     transform = transforms.Compose(
         [
             transforms.Resize(256),
@@ -93,7 +99,7 @@ if __name__ == "__main__":
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
         ]
     )
-    
+
     # fine-tuned StyleGAN g'
     generator_prime = Generator(1024, 512, 8, 2).to(device)
     generator_prime.eval()
@@ -106,49 +112,56 @@ if __name__ == "__main__":
     ckpt = torch.load(os.path.join(args.model_path, 'stylegan2-ffhq-config-f.pt'))
     generator.load_state_dict(ckpt["g_ema"])
     noises_single = generator.make_noise()
+    # netron.start(os.path.join(args.model_path, 'stylegan2-ffhq-config-f.pt'))
+    model_path = os.path.join(args.model_path, 'faces_w_encoder.jit')
+    # ckpt = torch.load(model_path, map_location='cpu')
+    # opts = ckpt['opts']
+    # opts['checkpoint_path'] = model_path
+    # opts = Namespace(**opts)
+    # encoder = pSp(opts)
 
-    model_path = os.path.join(args.model_path, 'encoder.pt')
-    ckpt = torch.load(model_path, map_location='cpu')
-    opts = ckpt['opts']
-    opts['checkpoint_path'] = model_path
-    opts = Namespace(**opts)
-    encoder = pSp(opts)
+    encoder = torch.jit.load(model_path)
     encoder.eval()
     encoder.to(device)
-
+    # netron.start(model_path)
     percept = lpips.PerceptualLoss(model="net-lin", net="vgg", use_gpu=device.startswith("cuda"))
     id_loss = id_loss.IDLoss(os.path.join(args.model_path, 'model_ir_se50.pth')).to(device).eval()
 
     print('Load models successfully!')
-    
-    datapath = os.path.join(args.data_path, args.style, 'images/train')
-    files = os.listdir(datapath) 
-    
+
+    datapath = os.path.join(args.data_path, "head2", 'images/train')
+    files = os.listdir(datapath)
+
     dict = {}
     dict2 = {}
-    for ii in range(0,len(files),args.batch):
-        batchfiles = files[ii:ii+args.batch]
+    for ii in range(0, len(files), args.batch):
+        batchfiles = files[ii:ii + args.batch]
         imgs = []
         for file in batchfiles:
             img = transform(Image.open(os.path.join(datapath, file)).convert("RGB"))
             imgs.append(img)
         imgs = torch.stack(imgs, 0).to(device)
 
-        with torch.no_grad():  
-            # reconstructed face g(z^+_e) and extrinsic style code z^+_e
-            img_rec, latent_e = encoder(imgs, randomize_noise=False, return_latents=True, z_plus_latent=True)
-            
+        with torch.no_grad():
+        # reconstructed face g(z^+_e) and extrinsic style code z^+_e
+            print("img1", img.shape)
+            print("img2", imgs.size())
+            print("img3", imgs[0].shape)
+            I = F.adaptive_avg_pool2d(imgs, 256)
+            print("IIIIIIIIII", I.shape)
+            latent_w = encoder(I)
+
         for j in range(imgs.shape[0]):
-            dict2[batchfiles[j]] = latent_e[j:j+1].cpu().numpy()
-        
+            dict2[batchfiles[j]] = latent_w[j:j + 1].cpu().numpy()
+
         noises = []
         for noise in noises_single:
             noises.append(noise.repeat(imgs.shape[0], 1, 1, 1).normal_())
         for noise in noises:
-            noise.requires_grad = True    
+            noise.requires_grad = True
 
-        # z^+ to be optimized in Eq. (1)
-        latent = latent_e.detach().clone()
+            # z^+ to be optimized in Eq. (1)
+        latent = latent_w.detach().clone()
         latent.requires_grad = True
 
         optimizer = optim.Adam([latent] + noises, lr=0.1)
@@ -197,27 +210,28 @@ if __name__ == "__main__":
 
         with torch.no_grad():
             # (optinal) preserve color
-            latent[:,8:18] = latent_e[:,8:18].detach()   
+            latent[:, 8:18] = latent_w[:, 8:18].detach()
             # g(hat(z)^+_e)
-            img_dsty, _ = generator([latent.detach()], input_is_latent=False, truncation=args.truncation, 
-                           truncation_latent=0, noise=noises, z_plus_latent=True)
+            img_dsty, _ = generator([latent.detach()], input_is_latent=False, truncation=args.truncation,
+                                    truncation_latent=0, noise=noises, z_plus_latent=True)
             img_dsty = F.adaptive_avg_pool2d(img_dsty.detach(), 256)
             # (optinal) preserve color
-            _, latent_i = encoder(img_dsty, randomize_noise=False, return_latents=True, z_plus_latent=True)
+            latent_i = encoder(img_dsty)
             # z^+_i
-            latent_i[:,8:18] = latent_e[:,8:18].detach()   
+            latent_i[:, 8:18] = latent_w[:, 8:18].detach()
             # g(hat(z)^+_i)
-            img_refine, _ = generator([latent_i.detach()], input_is_latent=False, truncation=args.truncation, 
-                           truncation_latent=0, noise=noises, z_plus_latent=True)
-            img_refine = F.adaptive_avg_pool2d(img_refine.detach(), (256,256))
+            img_refine, _ = generator([latent_i.detach()], input_is_latent=False, truncation=args.truncation,
+                                      truncation_latent=0, noise=noises, z_plus_latent=True)
+            img_refine = F.adaptive_avg_pool2d(img_refine.detach(), (256, 256))
 
             for j in range(imgs.shape[0]):
-                vis = torchvision.utils.make_grid(torch.cat([imgs[j:j+1], img_rec[j:j+1].detach(), 
-                                                             img_dsty[j:j+1].detach(), img_refine[j:j+1].detach()], dim=0), 4, 1)
-                save_image(torch.clamp(vis.cpu(),-1,1), os.path.join("./log/%s/destylization/"%(args.style), batchfiles[j]))
-                dict[batchfiles[j]] = latent_i[j:j+1].cpu().numpy()
-    
-    np.save(os.path.join(args.model_path, args.style, 'instyle_code.npy'), dict)    
-    np.save(os.path.join(args.model_path, args.style, 'exstyle_code.npy'), dict2) 
+                # vis = torchvision.utils.make_grid(torch.cat([imgs[j:j + 1], img_rec[j:j + 1].detach(),
+                #                                              img_dsty[j:j + 1].detach(), img_refine[j:j + 1].detach()],
+                #                                             dim=0), 4, 1)
+                # save_image(torch.clamp(vis.cpu(), -1, 1),
+                #            os.path.join("./log/%s/destylization/" % (args.style), batchfiles[j]))
+                dict[batchfiles[j]] = latent_i[j:j + 1].cpu().numpy()
+
+    np.save(os.path.join(args.model_path, args.style, 'instyle_code.npy'), dict)
+    np.save(os.path.join(args.model_path, args.style, 'exstyle_code.npy'), dict2)
     print('Destylization done!')
-    
