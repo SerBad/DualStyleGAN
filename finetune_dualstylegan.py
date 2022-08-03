@@ -507,14 +507,14 @@ if __name__ == "__main__":
     if get_rank() == 0 and wandb is not None and args.wandb:
         wandb.init(project="dualstylegan")
 
-    ckpt = torch.load(args.encoder_path, map_location='cpu')
-    opts = ckpt['opts']
-    opts['checkpoint_path'] = args.encoder_path
-    if 'learn_in_w' not in opts:
-        opts['learn_in_w'] = True
-    if 'output_size' not in opts:
-        opts['output_size'] = 1024
-    opts = Namespace(**opts)
+    # ckpt = torch.load(args.encoder_path, map_location='cpu')
+    # opts = ckpt['opts']
+    # opts['checkpoint_path'] = args.encoder_path
+    # if 'learn_in_w' not in opts:
+    #     opts['learn_in_w'] = True
+    # if 'output_size' not in opts:
+    #     opts['output_size'] = 1024
+    # opts = Namespace(**opts)
     # encoder = pSp(opts).to(device).eval()
     # encoder.latent_avg = encoder.latent_avg.to(device)
     vggloss = VGG19().to(device).eval()
