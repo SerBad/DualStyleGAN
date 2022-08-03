@@ -41,7 +41,6 @@ from model.stylegan.non_leaking import augment, AdaptiveAugment
 from model.stylegan.model import Generator, Discriminator
 
 
-
 class TrainOptions():
     def __init__(self):
 
@@ -522,8 +521,8 @@ if __name__ == "__main__":
 
     print('Encoder model successfully loaded!')
 
-    instyle_dict = np.load(args.instyle_path, allow_pickle='TRUE').item()
-    exstyle_dict = np.load(args.exstyle_path, allow_pickle='TRUE').item()
+    instyle_dict = np.load(args.instyle_path, allow_pickle=True).item()
+    exstyle_dict = np.load(args.exstyle_path, allow_pickle=True).item()
     path = args.image_path
     instyles = []
     exstyles = []
