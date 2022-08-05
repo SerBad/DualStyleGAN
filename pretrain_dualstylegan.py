@@ -468,16 +468,16 @@ if __name__ == "__main__":
     if get_rank() == 0 and wandb is not None and args.wandb:
         wandb.init(project="pretrain dualstylegan")
 
-    ckpt = torch.load(args.encoder_path, map_location='cpu')
-    opts = ckpt['opts']
-    opts['checkpoint_path'] = args.encoder_path
-    if 'learn_in_w' not in opts:
-        opts['learn_in_w'] = True
-    if 'output_size' not in opts:
-        opts['output_size'] = 1024
-    opts = Namespace(**opts)
-    model_path = os.path.join(args.model_path, 'faces_w_encoder.jit')
-    encoder = torch.jit.load(model_path)
+    # ckpt = torch.load(args.encoder_path, map_location='cpu')
+    # opts = ckpt['opts']
+    # opts['checkpoint_path'] = args.encoder_path
+    # if 'learn_in_w' not in opts:
+    #     opts['learn_in_w'] = True
+    # if 'output_size' not in opts:
+    #     opts['output_size'] = 1024
+    # opts = Namespace(**opts)
+
+    encoder = torch.jit.load(args.encoder_path)
     encoder.eval()
     encoder.to(device)
     vggloss = VGG19().to(device).eval()
@@ -493,3 +493,5 @@ if __name__ == "__main__":
              savemodel=False)
     args.iter = full_iter
     pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, encoder, vggloss, device, inject_index=5)
+
+#  pretrain_dualstylegan.py --iter 3000 --batch 4 /kaggle/input/zhoudualstylegan/DualStyleGAN/data/head2/lmdb/ --encoder_path /kaggle/input/zhoudualstylegan/DualStyleGAN/checkpoint/faces_w_encoder.jit --ckpt /kaggle/input/zhoudualstylegan/DualStyleGAN/checkpoint/stylegan2-ffhq-config-f.pt
