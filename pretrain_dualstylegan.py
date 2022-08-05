@@ -138,8 +138,7 @@ def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, en
 
         target_img = target_img.detach()
         style_img, _ = generator([sample_zs[1]], None, input_is_latent=False, z_plus_latent=False, use_res=False)
-        _, sample_style = encoder(F.adaptive_avg_pool2d(style_img, 256), randomize_noise=False,
-                                  return_latents=True, z_plus_latent=True, return_z_plus_latent=False)
+        sample_style = encoder(F.adaptive_avg_pool2d(style_img, 256))
         sample_style = sample_style.detach()
         if get_rank() == 0:
             # print("source_img", source_img, target_img)
@@ -185,8 +184,7 @@ def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, en
             style_img, _ = generator([real_zs[1]], None, input_is_latent=False, z_plus_latent=False, use_res=False)
             style_img = style_img.detach()
             # E(g(z2))
-            _, pspstyle = encoder(F.adaptive_avg_pool2d(style_img, 256), randomize_noise=False,
-                                  return_latents=True, z_plus_latent=True, return_z_plus_latent=False)
+            pspstyle = encoder(F.adaptive_avg_pool2d(style_img, 256))
             pspstyle = pspstyle.detach()
 
         requires_grad(generator, False)
@@ -478,8 +476,10 @@ if __name__ == "__main__":
     if 'output_size' not in opts:
         opts['output_size'] = 1024
     opts = Namespace(**opts)
-    encoder = pSp(opts).to(device).eval()
-    encoder.latent_avg = encoder.latent_avg.to(device)
+    model_path = os.path.join(args.model_path, 'faces_w_encoder.jit')
+    encoder = torch.jit.load(model_path)
+    encoder.eval()
+    encoder.to(device)
     vggloss = VGG19().to(device).eval()
 
     print('Models successfully loaded!')
