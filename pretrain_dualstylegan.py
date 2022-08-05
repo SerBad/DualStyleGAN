@@ -100,7 +100,7 @@ class TrainOptions():
 def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, encoder, vggloss: VGG19, device,
              inject_index=5,
              savemodel=True):
-    print("当前显存", pynvml.nvmlDeviceGetMemoryInfo(pynvml.nvmlDeviceGetHandleByIndex(0)).used)
+    # print("当前显存", pynvml.nvmlDeviceGetMemoryInfo(pynvml.nvmlDeviceGetHandleByIndex(0)).used)
     loader = sample_data(loader)
     vgg_weights = [0.5, 0.5, 0.5, 0.0, 0.0]
     pbar = range(args.iter)
@@ -129,7 +129,7 @@ def pretrain(args, loader, generator, discriminator, g_optim, d_optim, g_ema, en
     accum = 0.5 ** (32 / (10 * 1000))
     ada_aug_p = args.augment_p if args.augment_p > 0 else 0.0
     r_t_stat = 0
-    print("当前显存", pynvml.nvmlDeviceGetMemoryInfo(pynvml.nvmlDeviceGetHandleByIndex(0)).used)
+    # print("当前显存", pynvml.nvmlDeviceGetMemoryInfo(pynvml.nvmlDeviceGetHandleByIndex(0)).used)
     if args.augment and args.augment_p == 0:
         ada_augment = AdaptiveAugment(args.ada_target, args.ada_length, 8, device)
 
