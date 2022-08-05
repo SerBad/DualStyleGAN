@@ -95,6 +95,15 @@ def load_jit():
     model.eval()
 
 
+def save_latent():
+    I = load_image("data/head2/images/train/Image_96.JPG").to("cpu")
+    model = torch.jit.load("checkpoint/faces_w_encoder.jit")
+    print("IIIII", F.adaptive_avg_pool2d(I, 256).shape)
+    latent = model(F.adaptive_avg_pool2d(I, 256))
+    torch.save(latent, "head3_exstyles_latent.pth")
+
+
 if __name__ == "__main__":
-    save_jit()
-    load_jit()
+    # save_jit()
+    # load_jit()
+    save_latent()

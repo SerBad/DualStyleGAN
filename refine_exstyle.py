@@ -81,7 +81,7 @@ def noise_normalize_(noises):
         
 if __name__ == "__main__":
     device = "cuda"
-
+# python3 refine_exstyle.py --lr_color 0.1 --lr_structure 0.005 --ckpt ./checkpoint/head3/generator-001500.pt head3
     parser = TrainOptions()
     args = parser.parse()
     print('*'*50)
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     print('Load models successfully!')
     
-    datapath = os.path.join(args.data_path, args.style, 'images/train')
+    datapath = os.path.join(args.data_path,"head2", 'images/train')
     exstyles_dict = np.load(args.exstyle_path, allow_pickle='TRUE').item()
     instyles_dict = np.load(args.instyle_path, allow_pickle='TRUE').item()
     files = list(exstyles_dict.keys())

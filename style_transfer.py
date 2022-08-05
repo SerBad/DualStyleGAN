@@ -21,7 +21,7 @@ class TestOptions:
         self.parser = argparse.ArgumentParser(description="Exemplar-Based Style Transfer")
         self.parser.add_argument("--content", type=str, default='./data/content/unsplash-rDEOVtE7vOs.jpg',
                                  help="path of the content image")
-        self.parser.add_argument("--style", type=str, default='head2-copy', help="target style type")
+        self.parser.add_argument("--style", type=str, default='head3', help="target style type")
         self.parser.add_argument("-style_id", type=int, default=3, help="the id of the style image")
         self.parser.add_argument("--truncation", type=float, default=0.75,
                                  help="truncation for intrinsic style code (content)")
@@ -115,7 +115,8 @@ if __name__ == "__main__":
     # 来源于destylize.py保存下来的exstyle_code.npy
     # 使用encode，也就是pSp处理之后返回的style code z^+_e的集合
     exstyles = np.load(os.path.join(args.model_path, args.style, args.exstyle_name), allow_pickle=True).item()
-
+    print("os.path.join(args.model_path, args.style, args.exstyle_name)",
+          os.path.join(args.model_path, args.style, args.exstyle_name))
     print('Load models successfully!')
 
     # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
@@ -135,7 +136,7 @@ if __name__ == "__main__":
         # F.adaptive_avg_pool2d自适应平均池化函数
         # reconstructed content image and its intrinsic style code
         model = torch.jit.load("checkpoint/faces_w_encoder.jit")
-        print("IIIII",F.adaptive_avg_pool2d(I, 256).shape)
+        print("IIIII", F.adaptive_avg_pool2d(I, 256).shape)
         instyle = model(F.adaptive_avg_pool2d(I, 256))
         # instyle = model(I)
         print("I.shape", I.shape)
