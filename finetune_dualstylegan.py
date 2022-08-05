@@ -531,7 +531,7 @@ if __name__ == "__main__":
     i = 0
     for filename in instyle_dict.keys():
         i = i + 1
-        if i >= 300:
+        if i >= 250:
             break
         # print('start instyle_dict! filename', filename)
         instyle = instyle_dict[filename]
