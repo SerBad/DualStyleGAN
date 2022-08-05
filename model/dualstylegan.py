@@ -240,7 +240,7 @@ class DualStyleGAN(nn.Module):
                 return out, skip
 
         image = skip
-        print("这里执行到了没？回事因为最后输出的问题吗22？", image)
+        # print("这里执行到了没？回事因为最后输出的问题吗22？", image)
         # # image = torch.clamp(image.detach(), -1, 1)[0]
         # # print(image.layout)
         # # image = ((image.detach().numpy().transpose(1, 2, 0) + 1.0) * 127.5).astype(np.uint8)
