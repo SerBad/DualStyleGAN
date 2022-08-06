@@ -146,7 +146,7 @@ if __name__ == "__main__":
         imgs = torch.stack(imgs, 0).to(device)
 
         with torch.no_grad():
-        # reconstructed face g(z^+_e) and extrinsic style code z^+_e
+            # reconstructed face g(z^+_e) and extrinsic style code z^+_e
             print("img1", img.shape)
             print("img2", imgs.size())
             print("img3", imgs[0].shape)
@@ -220,7 +220,8 @@ if __name__ == "__main__":
                                     truncation_latent=0, noise=noises, z_plus_latent=True)
             img_dsty = F.adaptive_avg_pool2d(img_dsty.detach(), 256)
             # (optinal) preserve color
-            latent_i = encoder(img_dsty)
+            # latent_i = encoder(img_dsty)
+            _, latent_i = encoder(img_dsty)
             # z^+_i
             latent_i[:, 8:18] = latent_w[:, 8:18].detach()
             # g(hat(z)^+_i)
