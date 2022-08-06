@@ -221,7 +221,8 @@ if __name__ == "__main__":
             img_dsty = F.adaptive_avg_pool2d(img_dsty.detach(), 256)
             # (optinal) preserve color
             # latent_i = encoder(img_dsty)
-            _, latent_i = encoder(img_dsty)
+            _, latent_i = encoder(img_dsty, randomize_noise=False, return_latents=True, z_plus_latent=True)
+
             # z^+_i
             latent_i[:, 8:18] = latent_w[:, 8:18].detach()
             # g(hat(z)^+_i)
