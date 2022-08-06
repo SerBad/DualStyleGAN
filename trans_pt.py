@@ -38,7 +38,7 @@ def save_jit():
     exstyles = np.load(root + "checkpoint/head2-copy/refined_exstyle_code.npy", allow_pickle=True).item()
 
     model_path = os.path.join(root + 'checkpoint', 'encoder.pt')
-    ckpt = torch.load(model_path, map_location='cuda')
+    ckpt = torch.load(model_path, map_location=device)
     opts = ckpt['opts']
     opts['checkpoint_path'] = model_path
     opts = Namespace(**opts)
@@ -103,7 +103,58 @@ def save_latent():
     torch.save(latent, "head3_exstyles_latent.pth")
 
 
+def trans_tensor(latent: torch.Tensor, path: str):
+    dim0, dim1, dim2 = latent.shape
+    print(latent.shape)
+
+    filename = open(path, 'w')
+    data = []
+    # 遍历张量
+    for i in range(dim0):
+        for j in range(dim1):
+            for a in range(dim2):
+                element = latent.data[i][j][a]
+                data.append(element)
+                filename.write(str(element.item()))
+                filename.write('\n')
+
+                # print(element.item())
+
+    filename.close()
+
+
+def save_jit1():
+    device = "cpu"
+    root = "/home/zhou/Downloads/models/head2-copy"
+    pt_path = os.path.join(root, "generator.pt")
+    generator = DualStyleGAN(1024, 512, 8, 2, res_index=6)
+    ckpt = torch.load(pt_path, map_location=lambda storage, loc: storage)
+#
+    # "g_ema"是训练结果保存进去的约定值
+    generator.load_state_dict(ckpt["g_ema"])
+    generator.eval()
+    generator = generator.to(device)
+    if os.path.exists(os.path.join(root, "refined_exstyle_code.npy")):
+        exstyles = np.load(os.path.join(root, "refined_exstyle_code.npy"), allow_pickle=True).item()
+    else:
+        exstyles = np.load(os.path.join(root, "exstyle_code.npy"), allow_pickle=True).item()
+
+    with torch.no_grad():
+        img = load_image('./data/content/unsplash-rDEOVtE7vOs.jpg').to(device)
+        encoder = torch.jit.load("/home/zhou/Downloads/models/faces_w_encoder.jit")
+        instyle = encoder(F.adaptive_avg_pool2d(img, 256))
+        print("instyle", instyle.shape)
+        stylename = list(exstyles.keys())[1]
+        latent = torch.tensor(exstyles[stylename]).to(device)
+        trans_tensor(latent, os.path.join(root, "latent.pt"))
+
+        traced_script_module = torch.jit.trace(generator, (instyle, latent), check_trace=False)
+        traced_script_module_optimized = optimize_for_mobile(traced_script_module, backend='cpu')
+        traced_script_module_optimized._save_for_lite_interpreter(os.path.join(root, "mobile_model.ptl"))
+
+
 if __name__ == "__main__":
     # save_jit()
+    save_jit1()
     # load_jit()
-    save_latent()
+    # save_latent()

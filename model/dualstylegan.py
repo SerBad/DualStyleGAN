@@ -102,6 +102,7 @@ class DualStyleGAN(nn.Module):
     def forward(
             self,
             styles,  # intrinsic style code
+            # latent,  # extrinsic style code
             exstyles,  # extrinsic style code
             return_latents=False,
             return_feat=False,
@@ -130,7 +131,8 @@ class DualStyleGAN(nn.Module):
         # z_plus_latent = True  # intrinsic style code is z+ or z
         # use_res = True  # whether to use the extrinsic style path
         # fuse_index = 18  # layers > fuse_index do not use the extrinsic style path
-        # interp_weights = [0.75] * 7 + [1] * 11  # weight vector for style combination of two paths
+        # interp_weights = [0.6] * 7 + [1] * 11  # weight vector for style combination of two paths
+        # latent = exstyles
         # exstyles = self.generator.style(
         #     latent.reshape(latent.shape[0] * latent.shape[1], latent.shape[2])).reshape(
         #     latent.shape)
@@ -248,7 +250,6 @@ class DualStyleGAN(nn.Module):
         # # image.show()
         # # return T.ToTensor()(image)
         # return image
-
 
         if return_latents:
             return image, latent

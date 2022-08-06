@@ -21,7 +21,7 @@ class TestOptions:
         self.parser = argparse.ArgumentParser(description="Exemplar-Based Style Transfer")
         self.parser.add_argument("--content", type=str, default='./data/content/unsplash-rDEOVtE7vOs.jpg',
                                  help="path of the content image")
-        self.parser.add_argument("--style", type=str, default='head3', help="target style type")
+        self.parser.add_argument("--style", type=str, default='head2-copy', help="target style type")
         self.parser.add_argument("-style_id", type=int, default=3, help="the id of the style image")
         self.parser.add_argument("--truncation", type=float, default=0.75,
                                  help="truncation for intrinsic style code (content)")
@@ -91,8 +91,8 @@ if __name__ == "__main__":
     # Batch Normalization原理与实战 https://zhuanlan.zhihu.com/p/34879333
     generator.eval()
 
-    ckpt = torch.load(os.path.join(args.model_path, args.style, args.model_name),
-                      map_location=lambda storage, loc: storage)
+    ckpt = torch.load(os.path.join(args.model_path, args.style, args.model_name),map_location=lambda storage, loc: storage)
+    # ckpt = torch.load("dualstyle20220806/DualStyleGAN/checkpoint/head3/generator-001900.pt",map_location=lambda storage, loc: storage)
     # "g_ema"是训练结果保存进去的约定值
     generator.load_state_dict(ckpt["g_ema"])
     generator = generator.to(device)
@@ -138,7 +138,6 @@ if __name__ == "__main__":
         model = torch.jit.load("checkpoint/faces_w_encoder.jit")
         print("IIIII", F.adaptive_avg_pool2d(I, 256).shape)
         instyle = model(F.adaptive_avg_pool2d(I, 256))
-        # instyle = model(I)
         print("I.shape", I.shape)
         # instyle = generator.style(F.adaptive_avg_pool2d(I.reshape(I.shape[0] * I.shape[1], I.shape[2], I.shape[3]),512))
         # encoder = psp_encoders.GradualStyleEncoder(50, 'ir_se', opts)
@@ -176,7 +175,7 @@ if __name__ == "__main__":
         # optimized_scripted_module._save_for_lite_interpreter("head2-copy_model_encoder_only.pkl")
         # img_rec = torch.clamp(img_rec.detach(), -1, 1)
         # viz += [img_rec]
-        print('exstyles.keys()', exstyles.keys())
+        print('exstyles.keys()', len(exstyles.keys()))
         stylename = list(exstyles.keys())[args.style_id]
         latent = torch.tensor(exstyles[stylename]).to(device)
         if args.preserve_color:

@@ -113,13 +113,14 @@ if __name__ == "__main__":
     generator.load_state_dict(ckpt["g_ema"])
     noises_single = generator.make_noise()
     # netron.start(os.path.join(args.model_path, 'stylegan2-ffhq-config-f.pt'))
+    model_path = os.path.join(args.model_path, 'encoder.pt')
 
-    # ckpt = torch.load(model_path, map_location='cpu')
-    # opts = ckpt['opts']
-    # opts['checkpoint_path'] = model_path
-    # opts = Namespace(**opts)
-    # encoder = pSp(opts)
-    model_path = os.path.join(args.model_path, 'faces_w_encoder.jit')
+    ckpt = torch.load(model_path, map_location='cpu')
+    opts = ckpt['opts']
+    opts['checkpoint_path'] = model_path
+    opts = Namespace(**opts)
+    encoder = pSp(opts)
+    # model_path = os.path.join(args.model_path, 'faces_w_encoder.jit')
     encoder = torch.jit.load(model_path)
     encoder.eval()
     encoder.to(device)
