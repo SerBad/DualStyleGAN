@@ -108,7 +108,7 @@ if __name__ == "__main__":
     generator = Generator(1024, 512, 8, 2).to(device)
     generator.eval()
 
-    ckpt = torch.load(os.path.join(args.model_path, args.style, args.model_name))
+    ckpt = torch.load(args.model_name)
     generator_prime.load_state_dict(ckpt["g_ema"])
     ckpt = torch.load(os.path.join(args.model_path, 'stylegan2-ffhq-config-f.pt'))
     generator.load_state_dict(ckpt["g_ema"])
