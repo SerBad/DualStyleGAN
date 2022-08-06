@@ -82,6 +82,7 @@ def could_use_op(input):
     if input.device.type != "cuda":
         return False
 
+    return True
     if any(torch.__version__.startswith(x) for x in ["1.7.", "1.8."]):
         return True
 

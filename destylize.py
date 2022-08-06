@@ -87,7 +87,8 @@ if __name__ == "__main__":
     parser = TestOptions()
     args = parser.parse()
     print('*' * 50)
-    args.style = args.style + str(3)
+    # args.style = args.style + str(3)
+    args.style = args.style
     if not os.path.exists("log/%s/destylization/" % (args.style)):
         os.makedirs("log/%s/destylization/" % (args.style))
 
@@ -115,13 +116,13 @@ if __name__ == "__main__":
     # netron.start(os.path.join(args.model_path, 'stylegan2-ffhq-config-f.pt'))
     model_path = os.path.join(args.model_path, 'encoder.pt')
 
-    ckpt = torch.load(model_path, map_location='cpu')
+    ckpt = torch.load(model_path, map_location='cuda')
     opts = ckpt['opts']
     opts['checkpoint_path'] = model_path
     opts = Namespace(**opts)
     encoder = pSp(opts)
     # model_path = os.path.join(args.model_path, 'faces_w_encoder.jit')
-    encoder = torch.jit.load(model_path)
+    # encoder = torch.jit.load(model_path)
     encoder.eval()
     encoder.to(device)
     # netron.start(model_path)
@@ -130,7 +131,8 @@ if __name__ == "__main__":
 
     print('Load models successfully!')
 
-    datapath = os.path.join(args.data_path, "head2", 'images/train')
+    # datapath = os.path.join(args.data_path, "head2", 'images/train')
+    datapath = os.path.join(args.data_path, args.style, 'images/train')
     files = os.listdir(datapath)
 
     dict = {}
@@ -148,9 +150,10 @@ if __name__ == "__main__":
             print("img1", img.shape)
             print("img2", imgs.size())
             print("img3", imgs[0].shape)
-            I = F.adaptive_avg_pool2d(imgs, 256)
-            print("IIIIIIIIII", I.shape)
-            latent_w = encoder(I)
+            # I = F.adaptive_avg_pool2d(imgs, 256)
+            # print("IIIIIIIIII", I.shape)
+            # latent_w = encoder(I)
+            img_rec, latent_w = encoder(imgs, randomize_noise=False, return_latents=True, z_plus_latent=True)
 
         for j in range(imgs.shape[0]):
             dict2[batchfiles[j]] = latent_w[j:j + 1].cpu().numpy()
