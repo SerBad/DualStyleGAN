@@ -27,6 +27,7 @@ class TestOptions():
         self.parser.add_argument("--truncation", type=float, default=0.7,
                                  help="truncation for intrinsic style code (content)")
         self.parser.add_argument("--model_path", type=str, default='./checkpoint/', help="path of the saved models")
+        self.parser.add_argument("--save_model_path", type=str, default='./checkpoint/', help="path of the saved models")
         self.parser.add_argument("--model_name", type=str, default='fintune-000600.pt',
                                  help="name of the saved fine-tuned model")
         self.parser.add_argument("--data_path", type=str, default='./data/', help="path of dataset")
@@ -238,6 +239,6 @@ if __name__ == "__main__":
                 #            os.path.join("./log/%s/destylization/" % (args.style), batchfiles[j]))
                 dict[batchfiles[j]] = latent_i[j:j + 1].cpu().numpy()
 
-    np.save(os.path.join(args.model_path, args.style, 'instyle_code.npy'), dict)
-    np.save(os.path.join(args.model_path, args.style, 'exstyle_code.npy'), dict2)
+    np.save(os.path.join(args.save_model_path, args.style, 'instyle_code.npy'), dict)
+    np.save(os.path.join(args.save_model_path, args.style, 'exstyle_code.npy'), dict2)
     print('Destylization done!')
