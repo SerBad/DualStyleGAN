@@ -135,6 +135,9 @@ if __name__ == "__main__":
     # datapath = os.path.join(args.data_path, "head2", 'images/train')
     datapath = os.path.join(args.data_path, args.style, 'images/train')
     files = os.listdir(datapath)
+    path = os.path.join(args.save_model_path, args.style)
+    if not os.path.exists(path):
+        os.mkdir(path)
 
     dict = {}
     dict2 = {}
@@ -239,6 +242,6 @@ if __name__ == "__main__":
                 #            os.path.join("./log/%s/destylization/" % (args.style), batchfiles[j]))
                 dict[batchfiles[j]] = latent_i[j:j + 1].cpu().numpy()
 
-    np.save(os.path.join(args.save_model_path, args.style, 'instyle_code.npy'), dict)
-    np.save(os.path.join(args.save_model_path, args.style, 'exstyle_code.npy'), dict2)
+    np.save(os.path.join(path, 'instyle_code.npy'), dict)
+    np.save(os.path.join(path, 'exstyle_code.npy'), dict2)
     print('Destylization done!')
