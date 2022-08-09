@@ -9,7 +9,7 @@ import faiss
 import collections
 
 OptParams = collections.namedtuple('OptParams', 'lr batch_size epochs ' +
-                                                'decay_epochs decay_rate ')
+                                   'decay_epochs decay_rate ')
 OptParams.__new__.__defaults__ = (None, None, None, None, None)
 
 
@@ -33,7 +33,9 @@ class _netT(nn.Module):
         z = self.bn2(z)
         z = self.relu(z)
         z = self.lin_out(z)
+        print("_netT forward z", z.shape)
         return z
+
 
 class _netLin(nn.Module):
     def __init__(self, xn, yn):
@@ -51,7 +53,7 @@ class _ICP():
     def __init__(self, e_dim, z_dim):
         self.e_dim = e_dim
         self.z_dim = z_dim
-        self.netT = _netT(e_dim, z_dim)#.cuda()
+        self.netT = _netT(e_dim, z_dim)  # .cuda()
 
     def train(self, z_np, opt_params):
         self.opt_params = opt_params
@@ -87,7 +89,6 @@ class _ICP():
         nbrs.add(Te_np.astype('float32'))
         _, indices = nbrs.search(z_np.astype('float32'), 1)
         indices = indices.squeeze(1)
-
 
         # Start optimizing
         er = 0
