@@ -201,9 +201,9 @@ def sample_affine(p, size, height, width, device="cpu"):
     # print('flip', G, scale_mat(1 - 2.0 * param, torch.ones(size)), sep='\n')
 
     # 90 rotate
-    #param = category_sample(size, (0, 3))
-    #Gc = rotate_mat(-math.pi / 2 * param, device=device)
-    #G = random_mat_apply(p, Gc, G, eye, device=device)
+    # param = category_sample(size, (0, 3))
+    # Gc = rotate_mat(-math.pi / 2 * param, device=device)
+    # G = random_mat_apply(p, Gc, G, eye, device=device)
     # print('90 rotate', G, rotate_mat(-math.pi / 2 * param), sep='\n')
 
     # integer translate
@@ -358,6 +358,7 @@ class GridSampleBackward(autograd.Function):
     @staticmethod
     def forward(ctx, grad_output, input, grid):
         op = torch._C._jit_get_operation("aten::grid_sampler_2d_backward")
+        print("GridSampleBackward", op)
         grad_input, grad_grid = op(grad_output, input, grid, 0, 0, False)
         ctx.save_for_backward(grid)
 
@@ -398,8 +399,8 @@ def random_apply_affine(img, p, G=None, antialiasing_kernel=SYM6):
     )
 
     G_inv = (
-        translate_mat_single((pad_x1 - pad_x2).item() / 2, (pad_y1 - pad_y2).item() / 2)
-        @ G
+            translate_mat_single((pad_x1 - pad_x2).item() / 2, (pad_y1 - pad_y2).item() / 2)
+            @ G
     )
     up_pad = (
         (len_k + 2 - 1) // 2,
@@ -415,9 +416,9 @@ def random_apply_affine(img, p, G=None, antialiasing_kernel=SYM6):
     pad_k = len_k // 4
     shape = (batch_size, channel, (height + pad_k * 2) * 2, (width + pad_k * 2) * 2)
     G_inv = (
-        scale_mat_single(2 / img_2x.shape[3], 2 / img_2x.shape[2])
-        @ G_inv
-        @ scale_mat_single(1 / (2 / shape[3]), 1 / (2 / shape[2]))
+            scale_mat_single(2 / img_2x.shape[3], 2 / img_2x.shape[2])
+            @ G_inv
+            @ scale_mat_single(1 / (2 / shape[3]), 1 / (2 / shape[2]))
     )
     grid = F.affine_grid(G_inv[:, :2, :].to(img_2x), shape, align_corners=False)
     img_affine = grid_sample(img_2x, grid)
@@ -463,7 +464,7 @@ def augment(img, p, transform_matrix=(None, None)):
     if img.shape[1] == 3:
         img, C = random_apply_color(img, p, transform_matrix[1])
     else:
-        tmp, C = random_apply_color(img[:,0:3], p, transform_matrix[1])
-        img = torch.cat((tmp, img[:,3:]), dim=1)
+        tmp, C = random_apply_color(img[:, 0:3], p, transform_matrix[1])
+        img = torch.cat((tmp, img[:, 3:]), dim=1)
 
     return img, (G, C)
