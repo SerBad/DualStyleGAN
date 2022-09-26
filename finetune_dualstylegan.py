@@ -394,7 +394,7 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, insty
 
 
 if __name__ == "__main__":
-    device = "cuda:3"
+    device = "cuda:0"
 
     parser = TrainOptions()
     args = parser.parse()
