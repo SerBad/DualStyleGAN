@@ -72,9 +72,11 @@ def d_logistic_loss(real_pred, fake_pred):
 
 def d_r1_loss(real_pred, real_img):
     with conv2d_gradfix.no_weight_gradients():
-        grad_real, = autograd.grad(
+        grad_real, ss = autograd.grad(
             outputs=real_pred.sum(), inputs=real_img, create_graph=True
         )
+        print("d_r1_loss", grad_real, ss)
+
     grad_penalty = grad_real.pow(2).reshape(grad_real.shape[0], -1).sum(1).mean()
 
     return grad_penalty
