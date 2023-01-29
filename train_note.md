@@ -55,6 +55,13 @@ z隐藏空间，是只如果原来不是线性可分的，通过`特征转换`�
 
 接下来， 继续看网络结构、看TNN，同时找机会实验Pytorch Mobile。
 
+# 2023-01-29
+https://github.com/yuval-alaluf/hyperstyle
+https://github.com/omertov/encoder4editing
+https://github.com/eladrich/pixel2style2pixel
+生成的latent code的大小是[1, 18, 512]，没有更好的替代方法，可以使用 hyperstyle 中生成latent w的例子，使用的是encoder4editing中的BackboneEncoderUsingLastLayerIntoW解码器，而是BackboneEncoderUsingLastLayerIntoW来自于pixel2style2pixel中的BackboneEncoderUsingLastLayerIntoW，做了部分修改之后的样子。
+
+
 
 
 

@@ -120,6 +120,7 @@ def trans_onnx_by_jit():
     generator = torch.jit.load("head2-copy_model.jit")
     exstyles = torch.load("head2-copy_latent.pt")
     print('Load models successfully!')
+    print(exstyles.size())
 
     # torch.no_grad() 是一个上下文管理器，被该语句 wrap 起来的部分将不会track 梯度。
     with torch.no_grad():
