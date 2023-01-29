@@ -61,6 +61,8 @@ https://github.com/omertov/encoder4editing
 https://github.com/eladrich/pixel2style2pixel
 生成的latent code的大小是[1, 18, 512]，没有更好的替代方法，可以使用 hyperstyle 中生成latent w的例子，使用的是encoder4editing中的BackboneEncoderUsingLastLayerIntoW解码器，而是BackboneEncoderUsingLastLayerIntoW来自于pixel2style2pixel中的BackboneEncoderUsingLastLayerIntoW，做了部分修改之后的样子。
 
+整个训练过程使用了500张的图来
+
 
 
 
