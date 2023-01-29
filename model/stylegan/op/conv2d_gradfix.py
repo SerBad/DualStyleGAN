@@ -43,14 +43,14 @@ def conv2d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1):
 
 
 def conv_transpose2d(
-    input,
-    weight,
-    bias=None,
-    stride=1,
-    padding=0,
-    output_padding=0,
-    groups=1,
-    dilation=1,
+        input,
+        weight,
+        bias=None,
+        stride=1,
+        padding=0,
+        output_padding=0,
+        groups=1,
+        dilation=1,
 ):
     if could_use_op(input):
         return conv2d_gradfix(
@@ -82,7 +82,6 @@ def could_use_op(input):
     if input.device.type != "cuda":
         return False
 
-    return True
     if any(torch.__version__.startswith(x) for x in ["1.7.", "1.8."]):
         return True
 
@@ -103,7 +102,7 @@ conv2d_gradfix_cache = dict()
 
 
 def conv2d_gradfix(
-    transpose, weight_shape, stride, padding, output_padding, dilation, groups
+        transpose, weight_shape, stride, padding, output_padding, dilation, groups
 ):
     ndim = 2
     weight_shape = tuple(weight_shape)
